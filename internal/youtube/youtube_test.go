@@ -14,7 +14,7 @@ func TestYoutube(t *testing.T) {
 		testApiKey := "_test_youtubeApiKey"
 		os.Setenv("YOUTUBE_API_KEY", testApiKey)
 
-		yt := NewYoutubeClient()
+		yt := NewClient()
 
 		if yt.playlistId == "" {
 			t.Errorf("playlistId not set on Youtube Client")
@@ -29,12 +29,12 @@ func TestYoutube(t *testing.T) {
 		t.Skip("skip test calling YoutubeAPI")
 
 		// Load actual Youtube API Key
-		err := godotenv.Load("../.env")
+		err := godotenv.Load("../../.env")
 		if err != nil {
 			log.Fatal("Error loading .env file")
 		}
 
-		yt := NewYoutubeClient()
+		yt := NewClient()
 
 		yt.playlistItems = []PlaylistItem{}
 		yt.LoadPlaylistItems("")
@@ -71,7 +71,7 @@ func TestYoutube(t *testing.T) {
 				},
 			})
 
-		yt := NewYoutubeClient()
+		yt := NewClient()
 
 		yt.LoadPlaylistItems(testPageToken)
 

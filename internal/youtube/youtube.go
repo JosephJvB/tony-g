@@ -74,7 +74,7 @@ func getPlaylistItems(key string, playlistId string, pageToken string) ApiRespon
 	return responseBody
 }
 
-func NewYoutubeClient() YoutubeClient {
+func NewClient() YoutubeClient {
 	return YoutubeClient{
 		apiKey:     os.Getenv("YOUTUBE_API_KEY"),
 		playlistId: "PLP4CSgl7K7or84AAhr7zlLNpghEnKWu2c",
