@@ -50,12 +50,16 @@ type googlesheets interface {
 }
 
 type GoogleSheetsClient struct {
-	sheetsService *sheets.Service
-	parsedVideos  []ParsedVideo
+	sheetsService   *sheets.Service
+	parsedVideos    []ParsedVideo
+	parsedVideosMap map[string]bool
 }
 
 func (gs *GoogleSheetsClient) LoadSheetData() {
 	gs.parsedVideos = loadParsedVideos(gs.sheetsService)
+	for _, v := range gs.parsedVideos {
+		gs.parsedVideosMap[v.Id] = true
+	}
 }
 
 func loadParsedVideos(service *sheets.Service) []ParsedVideo {
@@ -100,6 +104,8 @@ func NewClient() GoogleSheetsClient {
 	}
 
 	return GoogleSheetsClient{
-		sheetsService: sheetsService,
+		sheetsService:   sheetsService,
+		parsedVideos:    []ParsedVideo{},
+		parsedVideosMap: map[string]bool{},
 	}
 }

@@ -7,13 +7,13 @@ import (
 )
 
 const BaseUrl = "https://www.googleapis.com/youtube/v3"
+const PlaylistId = "PLP4CSgl7K7or84AAhr7zlLNpghEnKWu2c"
 
 type IYoutubeClient interface {
 	LoadPlaylistItems()
 }
 type YoutubeClient struct {
 	apiKey        string
-	playlistId    string
 	playlistItems []PlaylistItem
 }
 
@@ -36,7 +36,7 @@ type ApiResponse struct {
 func (yt *YoutubeClient) LoadPlaylistItems(pageToken string) {
 	resp := getPlaylistItems(
 		yt.apiKey,
-		yt.playlistId,
+		PlaylistId,
 		pageToken,
 	)
 
@@ -76,7 +76,7 @@ func getPlaylistItems(key string, playlistId string, pageToken string) ApiRespon
 
 func NewClient() YoutubeClient {
 	return YoutubeClient{
-		apiKey:     os.Getenv("YOUTUBE_API_KEY"),
-		playlistId: "PLP4CSgl7K7or84AAhr7zlLNpghEnKWu2c",
+		apiKey:        os.Getenv("YOUTUBE_API_KEY"),
+		playlistItems: []PlaylistItem{},
 	}
 }

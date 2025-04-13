@@ -11,7 +11,7 @@ import (
 
 func TestGoogleSheets(t *testing.T) {
 	t.Run("Can load videos from google sheets", func(t *testing.T) {
-		t.Skip("test calls real google api")
+		t.Skip("skip test calling real google sheets api")
 
 		err := godotenv.Load("../../.env")
 		if err != nil {
@@ -31,6 +31,9 @@ func TestGoogleSheets(t *testing.T) {
 
 		if len(gs.parsedVideos) == 0 {
 			t.Errorf("Expected parsed videos to be loaded")
+		}
+		if len(gs.parsedVideosMap) == 0 {
+			t.Errorf("Expected parsed videos map to be loaded")
 		}
 
 		b, err := json.MarshalIndent(gs.parsedVideos, "", "	")

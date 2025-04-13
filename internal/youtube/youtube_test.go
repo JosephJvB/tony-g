@@ -16,10 +16,6 @@ func TestYoutube(t *testing.T) {
 
 		yt := NewClient()
 
-		if yt.playlistId == "" {
-			t.Errorf("playlistId not set on Youtube Client")
-		}
-
 		if yt.apiKey == "" {
 			t.Errorf("apiKey not set on Youtube Client")
 		}
