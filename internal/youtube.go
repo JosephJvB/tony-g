@@ -64,6 +64,10 @@ func getPlaylistItems(key string, playlistId string, pageToken string) ApiRespon
 	}
 	defer resp.Body.Close()
 
+	// TODO: handle status codes?
+	// if resp.StatusCode > 299 {
+	// }
+
 	responseBody := ApiResponse{}
 	json.NewDecoder(resp.Body).Decode(&responseBody)
 
