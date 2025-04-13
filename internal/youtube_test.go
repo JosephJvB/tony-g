@@ -26,6 +26,8 @@ func TestYoutube(t *testing.T) {
 	})
 
 	t.Run("can load all youtube items", func(t *testing.T) {
+		t.Skip("skip test calling YoutubeAPI")
+
 		yt := NewYoutubeClient()
 
 		yt.playlistItems = []PlaylistItem{}
