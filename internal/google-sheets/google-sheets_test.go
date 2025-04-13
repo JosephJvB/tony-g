@@ -27,7 +27,7 @@ func TestGoogleSheets(t *testing.T) {
 
 		gs := NewClient()
 
-		gs.LoadSheetData()
+		gs.LoadParsedVideos()
 
 		if len(gs.parsedVideos) == 0 {
 			t.Errorf("Expected parsed videos to be loaded")

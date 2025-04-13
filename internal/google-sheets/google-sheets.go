@@ -45,7 +45,7 @@ type ParsedVideo struct {
 	TotalTracks string
 }
 
-type googlesheets interface {
+type IGoogleSheetsClient interface {
 	LoadSheetData()
 }
 
@@ -55,22 +55,16 @@ type GoogleSheetsClient struct {
 	parsedVideosMap map[string]bool
 }
 
-func (gs *GoogleSheetsClient) LoadSheetData() {
-	gs.parsedVideos = loadParsedVideos(gs.sheetsService)
-	for _, v := range gs.parsedVideos {
-		gs.parsedVideosMap[v.Id] = true
-	}
-}
-
-func loadParsedVideos(service *sheets.Service) []ParsedVideo {
+func (gs *GoogleSheetsClient) LoadParsedVideos() {
 	sheetRange := ParsedVideosSheet.Name + "!" + ParsedVideosSheet.AllRowRange
 
-	resp, err := service.Spreadsheets.Values.Get(SpreadsheetId, sheetRange).Do()
+	resp, err := gs.sheetsService.Spreadsheets.Values.
+		Get(SpreadsheetId, sheetRange).
+		Do()
 	if err != nil {
 		panic(err)
 	}
 
-	videos := []ParsedVideo{}
 	for _, row := range resp.Values {
 		v := ParsedVideo{
 			Id:          row[0].(string),
@@ -79,10 +73,9 @@ func loadParsedVideos(service *sheets.Service) []ParsedVideo {
 			TotalTracks: row[3].(string),
 		}
 
-		videos = append(videos, v)
+		gs.parsedVideos = append(gs.parsedVideos, v)
+		gs.parsedVideosMap[v.Id] = true
 	}
-
-	return videos
 }
 
 // https://gist.github.com/karayel/1b915b61d3cf307ca23b14313848f3c4
