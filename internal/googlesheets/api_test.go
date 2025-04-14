@@ -32,7 +32,7 @@ func TestGoogleSheets(t *testing.T) {
 		if len(gs.parsedVideos) == 0 {
 			t.Errorf("Expected parsed videos to be loaded")
 		}
-		if len(gs.parsedVideosMap) == 0 {
+		if len(gs.ParsedVideosMap) == 0 {
 			t.Errorf("Expected parsed videos map to be loaded")
 		}
 
@@ -41,7 +41,7 @@ func TestGoogleSheets(t *testing.T) {
 			panic(err)
 		}
 
-		err = os.WriteFile("../../videos.json", b, 0666)
+		err = os.WriteFile("../../data/videos.json", b, 0666)
 		if err != nil {
 			panic(err)
 		}
@@ -75,7 +75,7 @@ func TestGoogleSheets(t *testing.T) {
 			panic(err)
 		}
 
-		err = os.WriteFile("../../tracks.json", b, 0666)
+		err = os.WriteFile("../../data/tracks.json", b, 0666)
 		if err != nil {
 			panic(err)
 		}

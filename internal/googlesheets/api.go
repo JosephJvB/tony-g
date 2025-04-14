@@ -53,7 +53,7 @@ type IGoogleSheetsClient interface {
 type GoogleSheetsClient struct {
 	sheetsService   *sheets.Service
 	parsedVideos    []ParsedVideo
-	parsedVideosMap map[string]bool
+	ParsedVideosMap map[string]bool
 	missingTracks   []MissingTrack
 }
 
@@ -108,7 +108,7 @@ func (gs *GoogleSheetsClient) LoadParsedVideos() {
 		}
 
 		gs.parsedVideos = append(gs.parsedVideos, v)
-		gs.parsedVideosMap[v.Id] = true
+		gs.ParsedVideosMap[v.Id] = true
 	}
 }
 
@@ -133,6 +133,6 @@ func NewClient() GoogleSheetsClient {
 	return GoogleSheetsClient{
 		sheetsService:   sheetsService,
 		parsedVideos:    []ParsedVideo{},
-		parsedVideosMap: map[string]bool{},
+		ParsedVideosMap: map[string]bool{},
 	}
 }

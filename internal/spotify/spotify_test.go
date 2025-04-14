@@ -78,7 +78,7 @@ func TestSpotify(t *testing.T) {
 			panic(err)
 		}
 
-		err = os.WriteFile("../../playlists.json", b, 0666)
+		err = os.WriteFile("../../data/playlists.json", b, 0666)
 		if err != nil {
 			panic(err)
 		}
@@ -105,7 +105,7 @@ func TestSpotify(t *testing.T) {
 			panic(err)
 		}
 
-		err = os.WriteFile("../../playlist-items.json", b, 0666)
+		err = os.WriteFile("../../data/playlist-items.json", b, 0666)
 		if err != nil {
 			panic(err)
 		}

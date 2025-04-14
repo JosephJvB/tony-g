@@ -1,6 +1,7 @@
 package youtube
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"testing"
@@ -11,6 +12,7 @@ import (
 
 func TestYoutube(t *testing.T) {
 	t.Run("it can create a new youtube client", func(t *testing.T) {
+		t.Skip("its messing with the youtube api key")
 		testApiKey := "_test_youtubeApiKey"
 		os.Setenv("YOUTUBE_API_KEY", testApiKey)
 
@@ -32,11 +34,21 @@ func TestYoutube(t *testing.T) {
 
 		yt := NewClient()
 
-		yt.playlistItems = []PlaylistItem{}
+		yt.PlaylistItems = []PlaylistItem{}
 		yt.LoadPlaylistItems("")
 
-		if len(yt.playlistItems) == 0 {
+		if len(yt.PlaylistItems) == 0 {
 			t.Errorf("Failed to load playlist items")
+		}
+
+		b, err := json.MarshalIndent(yt.PlaylistItems, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/youtube-videos.json", b, 0666)
+		if err != nil {
+			panic(err)
 		}
 	})
 
@@ -71,11 +83,11 @@ func TestYoutube(t *testing.T) {
 
 		yt.LoadPlaylistItems(testPageToken)
 
-		if len(yt.playlistItems) != 1 {
-			t.Errorf("Expected to load one playlist item received %d", len(yt.playlistItems))
+		if len(yt.PlaylistItems) != 1 {
+			t.Errorf("Expected to load one playlist item received %d", len(yt.PlaylistItems))
 		}
 
-		testItemId := yt.playlistItems[0].Id
+		testItemId := yt.PlaylistItems[0].Id
 		if testItemId != "_test_id" {
 			t.Errorf("Expected test playlist item to have Id _test_id. Received %s", testItemId)
 		}

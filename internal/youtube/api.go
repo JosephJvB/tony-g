@@ -16,14 +16,16 @@ type IYoutubeClient interface {
 }
 type YoutubeClient struct {
 	apiKey        string
-	playlistItems []PlaylistItem
+	PlaylistItems []PlaylistItem
 }
 
 type PlaylistItem struct {
 	Id      string `json:"id"`
 	Snippet struct {
 		Description         string `json:"description"`
+		PublishedAt         string `json:"publishedAt"`
 		VideoOwnerChannelId string `json:"videoOwnerChannelId"`
+		ChannelId           string `json:"channelId"`
 	} `json:"snippet"`
 	Status struct {
 		PrivacyStatus string `json:"privacyStatus"`
@@ -42,7 +44,7 @@ func (yt *YoutubeClient) LoadPlaylistItems(pageToken string) {
 		pageToken,
 	)
 
-	yt.playlistItems = append(yt.playlistItems, resp.Items...)
+	yt.PlaylistItems = append(yt.PlaylistItems, resp.Items...)
 
 	// recurse
 	if resp.NextPageToken != "" {
@@ -83,6 +85,6 @@ func getPlaylistItems(key string, playlistId string, pageToken string) ApiRespon
 func NewClient() YoutubeClient {
 	return YoutubeClient{
 		apiKey:        os.Getenv("YOUTUBE_API_KEY"),
-		playlistItems: []PlaylistItem{},
+		PlaylistItems: []PlaylistItem{},
 	}
 }
