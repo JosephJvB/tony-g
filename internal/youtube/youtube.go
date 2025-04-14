@@ -59,7 +59,7 @@ func getPlaylistItems(key string, playlistId string, pageToken string) ApiRespon
 	queryPart.Set("part", "snippet,status")
 	queryPart.Set("key", key)
 	if pageToken != "" {
-		queryPart.Set(pageToken, pageToken)
+		queryPart.Set("pageToken", pageToken)
 	}
 
 	apiUrl += "?" + queryPart.Encode()
