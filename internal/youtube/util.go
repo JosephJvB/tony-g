@@ -1,6 +1,10 @@
 package youtube
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+	"time"
+)
 
 var BestTrackPrefixes = []string{"!!!BEST", "!!BEST", "!BEST"}
 
@@ -15,6 +19,12 @@ type BestTrack struct {
 
 func ParseVideo(video PlaylistItem) []BestTrack {
 	tracks := []BestTrack{}
+
+	videoDate, err := time.Parse(time.RFC3339, video.Snippet.PublishedAt)
+	publishedAtYear := -1
+	if err == nil {
+		publishedAtYear = videoDate.Year()
+	}
 
 	bestTrackList := getBestTracksList(video.Snippet.Description)
 	if len(bestTrackList) == 0 {
@@ -37,9 +47,11 @@ func ParseVideo(video PlaylistItem) []BestTrack {
 			Name:               strings.TrimSpace(artistTrackName[1]),
 			Artist:             strings.TrimSpace(artistTrackName[0]),
 			Link:               strings.TrimSpace(ts[1]),
-			Year:               0,
+			Year:               publishedAtYear,
 			VideoPublishedDate: video.Snippet.PublishedAt,
 		}
+		// don't really need id anymore but the column still exists in the spreadsheet
+		t.Id = strings.Join([]string{t.Artist, t.Name, strconv.Itoa(t.Year)}, "__")
 
 		tracks = append(tracks, t)
 	}
