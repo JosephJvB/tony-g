@@ -6,12 +6,17 @@ Gonna end up deploying him to AWS as per. So I'll use this repo as ref https://g
 
 need:
 
+- aws parameter store api
 - youtube api
 - google sheets api
 - spotify api
 
 steps:
 
+- load secrets from parameter store
+  - currently other clients are reading from os.Getenv()
+  - I could have param store do os.Setenv() if I wanted
+  - but I think I'd rather pass from paramClient into other clients on creation
 - load youtube items
 - load google sheets
 - load existing playlists
