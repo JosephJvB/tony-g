@@ -2,6 +2,7 @@ package spotify
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -17,19 +18,20 @@ type ISpotifyClient interface {
 }
 
 type SpotifyClient struct {
-	clientId     string
-	clientSecret string
-	refreshToken string
-	basicToken   string
-	myPlaylists  []SpotifyPlaylist
+	clientId      string
+	clientSecret  string
+	refreshToken  string
+	basicToken    string
+	accessToken   string
+	tonyPlaylists []SpotifyPlaylist
 }
 
 func NewClient() SpotifyClient {
 	return SpotifyClient{
-		clientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
-		clientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
-		refreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
-		myPlaylists:  []SpotifyPlaylist{},
+		clientId:      os.Getenv("SPOTIFY_CLIENT_ID"),
+		clientSecret:  os.Getenv("SPOTIFY_CLIENT_SECRET"),
+		refreshToken:  os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		tonyPlaylists: []SpotifyPlaylist{},
 	}
 }
 
@@ -48,13 +50,49 @@ func (s *SpotifyClient) LoadBasicToken() {
 		panic(err)
 	}
 
+	if resp.StatusCode > 299 {
+		log.Fatalf("\nLoadBasicToken failed: \"%s\"", resp.Status)
+	}
+
 	tokenResponse := SpotifyTokenResponse{}
 	json.NewDecoder(resp.Body).Decode(&tokenResponse)
 
 	s.basicToken = tokenResponse.AccessToken
 }
 
-func (s *SpotifyClient) LoadMyPlaylists() {
+func (s *SpotifyClient) LoadAccessToken() {
+	apiUrl := AccountsBaseUrl + "/token"
+
+	data := url.Values{}
+	data.Set("grant_type", "refresh_token")
+	data.Set("refresh_token", s.refreshToken)
+	postData := strings.NewReader(data.Encode())
+
+	req, _ := http.NewRequest("POST", apiUrl, postData)
+
+	req.SetBasicAuth(s.clientId, s.clientSecret)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+
+	if resp.StatusCode > 299 {
+		log.Fatalf("\nLoadAccessToken failed: \"%s\"", resp.Status)
+	}
+
+	tokenResponse := SpotifyTokenResponse{}
+	json.NewDecoder(resp.Body).Decode(&tokenResponse)
+
+	s.accessToken = tokenResponse.AccessToken
+}
+
+func (s *SpotifyClient) LoadTonyPlaylists() {
+	if s.accessToken == "" {
+		s.LoadAccessToken()
+	}
+
 	apiUrl := ApiBaseUrl + "/me/playlists"
 
 	queryPart := url.Values{}
@@ -62,28 +100,55 @@ func (s *SpotifyClient) LoadMyPlaylists() {
 
 	apiUrl += "?" + queryPart.Encode()
 
-	for apiUrl != "" {
-		resp := getPlaylists(apiUrl, s.basicToken)
+	playlists := getPaginatedItems[SpotifyPlaylist](apiUrl, s.accessToken)
 
-		s.myPlaylists = append(s.myPlaylists, resp.Items...)
+	for _, playlist := range playlists {
+		isTony := strings.HasPrefix(playlist.Name, TonyPlaylistPrefix)
 
-		apiUrl = resp.Next
+		if isTony {
+			s.tonyPlaylists = append(s.tonyPlaylists, playlist)
+		}
 	}
 }
 
-func getPlaylists(apiUrl string, token string) PaginatedResponse[SpotifyPlaylist] {
-	req, _ := http.NewRequest("GET", apiUrl, nil)
+func getPaginatedItems[T any](startUrl string, token string) []T {
+	apiUrl := startUrl
 
-	bearerToken := "Bearer " + token
-	req.Header.Set("Authorization", bearerToken)
+	items := []T{}
 
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		panic(err)
+	for apiUrl != "" {
+		req, _ := http.NewRequest("GET", apiUrl, nil)
+
+		authHeaderValue := "Bearer " + token
+		req.Header.Set("Authorization", authHeaderValue)
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			panic(err)
+		}
+
+		if resp.StatusCode > 299 {
+			log.Fatalf("\ngetPaginatedItems failed: \"%s\"\n%s\n", resp.Status, apiUrl)
+		}
+
+		responseBody := PaginatedResponse[T]{}
+		json.NewDecoder(resp.Body).Decode(&responseBody)
+
+		items = append(items, responseBody.Items...)
+		apiUrl = responseBody.Next
 	}
 
-	responseBody := PaginatedResponse[SpotifyPlaylist]{}
-	json.NewDecoder(resp.Body).Decode(&responseBody)
+	return items
+}
 
-	return responseBody
+func (s *SpotifyClient) GetPlaylistItems(playlistId string) []SpotifyPlaylistItem {
+	if s.accessToken == "" {
+		s.LoadAccessToken()
+	}
+
+	apiUrl := ApiBaseUrl + "/playlists/" + playlistId + "/tracks"
+
+	items := getPaginatedItems[SpotifyPlaylistItem](apiUrl, s.accessToken)
+
+	return items
 }

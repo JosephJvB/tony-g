@@ -2,6 +2,7 @@ package youtube
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -69,9 +70,9 @@ func getPlaylistItems(key string, playlistId string, pageToken string) ApiRespon
 	}
 	defer resp.Body.Close()
 
-	// TODO: handle status codes?
-	// if resp.StatusCode > 299 {
-	// }
+	if resp.StatusCode > 299 {
+		log.Fatalf("\ngetPlaylistItems failed: \"%s\"", resp.Status)
+	}
 
 	responseBody := ApiResponse{}
 	json.NewDecoder(resp.Body).Decode(&responseBody)
