@@ -3,6 +3,7 @@ package youtube
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"os"
 )
 
@@ -49,16 +50,20 @@ func (yt *YoutubeClient) LoadPlaylistItems(pageToken string) {
 }
 
 func getPlaylistItems(key string, playlistId string, pageToken string) ApiResponse {
-	url := BaseUrl + "/playlistItems"
-	url += "?maxResults=50"
-	url += "&playlistId=" + playlistId
-	url += "&part=snippet,status"
-	url += "&key=" + key
+	apiUrl := BaseUrl + "/playlistItems"
+
+	queryPart := url.Values{}
+	queryPart.Set("maxResults", "50")
+	queryPart.Set("playlistId", playlistId)
+	queryPart.Set("part", "snippet,status")
+	queryPart.Set("key", key)
 	if pageToken != "" {
-		url += "&pageToken=" + pageToken
+		queryPart.Set(pageToken, pageToken)
 	}
 
-	resp, err := http.Get(url)
+	apiUrl += "?" + queryPart.Encode()
+
+	resp, err := http.Get(apiUrl)
 	if err != nil {
 		panic(err)
 	}
