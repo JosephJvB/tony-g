@@ -2,6 +2,7 @@ package googlesheets
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"golang.org/x/oauth2/jwt"
@@ -53,6 +54,39 @@ type GoogleSheetsClient struct {
 	sheetsService   *sheets.Service
 	parsedVideos    []ParsedVideo
 	parsedVideosMap map[string]bool
+	missingTracks   []MissingTrack
+}
+
+func (gs *GoogleSheetsClient) LoadMissingTracks() {
+	sheetRange := MissingTrackSheet.Name + "!" + MissingTrackSheet.AllRowRange
+
+	resp, err := gs.sheetsService.Spreadsheets.Values.
+		Get(SpreadsheetId, sheetRange).
+		Do()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("got rows: %d\n", len(resp.Values))
+
+	for _, row := range resp.Values {
+
+		spotifyIds := ""
+		if len(row) >= 6 {
+			spotifyIds = row[5].(string)
+		}
+
+		t := MissingTrack{
+			Id:         row[0].(string),
+			Name:       row[1].(string),
+			Artist:     row[2].(string),
+			Date:       row[3].(string),
+			Link:       row[4].(string),
+			SpotifyIds: spotifyIds,
+		}
+
+		gs.missingTracks = append(gs.missingTracks, t)
+	}
 }
 
 func (gs *GoogleSheetsClient) LoadParsedVideos() {

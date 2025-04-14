@@ -46,4 +46,38 @@ func TestGoogleSheets(t *testing.T) {
 			panic(err)
 		}
 	})
+
+	t.Run("Can load missing tracks from google sheets", func(t *testing.T) {
+		t.Skip("skip test calling real google sheets api")
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		// .env file does not handle private keys gracefully
+		// probably would be better saved to a file than in .env. Oh well.
+		invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
+		fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
+
+		os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
+
+		gs := NewClient()
+
+		gs.LoadMissingTracks()
+
+		if len(gs.missingTracks) == 0 {
+			t.Errorf("Expected missingTracks to be loaded")
+		}
+
+		b, err := json.MarshalIndent(gs.missingTracks, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../tracks.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
 }
