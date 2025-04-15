@@ -26,3 +26,42 @@ steps:
 https://edu.anarcho-copy.org/Programming%20Languages/Go/Concurrency%20in%20Go.pdf
 
 go clean -testcache: expires all test results
+
+hey actually. Tony and his mates keep an up to date Apple playlist no?
+https://music.apple.com/us/playlist/my-fav-singles-of-2025/pl.u-ayeZTygbKDy
+
+Why not use that as the source, rather than youtube video descriptions?
+
+Better flow:
+playlist description says it gets updated every friday
+so every saturday
+get tony's playlists from apple music
+find the current one by title (current year)
+get all the playlists songs from apple music
+(filter for just the recent ones?)
+
+get my spotify playlist for the same year (create if not exists)
+get all songs currently in my playlist
+
+find the tracks that need to be added (song_artist_album)
+find those tracks in spotify
+add them to playlist
+Seems easy enough?
+
+nah wait apple music api is garbage
+
+lets do it this way:
+scrape https://theneedledrop.com/loved-list/${year}
+
+find the apple music link in html:
+https://embed.music.apple.com/us/playlist/my-fav-singles-of-2024/pl.u-e2ZmtK9VM5K?wmode=opaque
+
+scrape the apple music playlist page for tracks: songname, artist, album
+
+get google sheets tracks that I've already tried to add
+
+find those tracks in spotify that I haven't tried to add
+
+get my spotify playlists and their items
+
+search in spotify for those tracks
