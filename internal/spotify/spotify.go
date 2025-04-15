@@ -112,6 +112,7 @@ func (s *SpotifyClient) GetPlaylistByName(name string) SpotifyPlaylist {
 	}
 
 	// feels kinda garbage
+	// maybe this instead: https://stackoverflow.com/questions/2050391/how-to-check-if-a-map-contains-a-key-in-go
 	return SpotifyPlaylist{}
 }
 
@@ -180,7 +181,10 @@ func (s *SpotifyClient) FindTrack(t scraping.ScrapedTrack) []SpotifyTrack {
 	trackQuery += " artist:" + t.Artist
 	trackQuery += " year:" + strconv.Itoa(t.Year)
 	if t.Album != "" {
-		trackQuery += " album:" + t.Album
+		// apple music adds " - EP" | " - Single" to album suffix sometimes
+		// I think that would break the spotify query
+		// could trim that, but prefer to remove it
+		// trackQuery += " album:" + t.Album
 	}
 
 	queryPart := url.Values{}
