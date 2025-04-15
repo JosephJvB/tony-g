@@ -1,6 +1,6 @@
 package spotify
 
-const TonyPlaylistPrefix = "TONY'S TOP TRACKS "
+const TonyPlaylistPrefix = "TONY'S TOP TRACKS #2 "
 
 type SpotifyArtist struct {
 	Id   string `json:"id"`

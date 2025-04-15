@@ -2,8 +2,9 @@ package googlesheets
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"strconv"
+	"strings"
+	util "tony-gony/internal"
 
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/option"
@@ -18,32 +19,20 @@ type SheetConfig struct {
 	AllRowRange string
 }
 
-var MissingTrackSheet = SheetConfig{
-	Name:        "Missing Tracks",
-	Id:          1814426117,
+var ScrapedTracksSheet = SheetConfig{
+	Name:        "Scraped Tracks",
+	Id:          279196507,
 	AllRowRange: "A2:F",
 }
 
-type MissingTrack struct {
-	Id         string
-	Name       string
-	Artist     string
-	Date       string
-	Link       string
-	SpotifyIds string
-}
-
-var ParsedVideosSheet = SheetConfig{
-	Name:        "Youtube Videos",
-	Id:          404,
-	AllRowRange: "A2:D",
-}
-
-type ParsedVideo struct {
-	Id          string
-	Title       string
-	PublishedAt string
-	TotalTracks string
+type ScrapedTrackRow struct {
+	Id      string
+	Title   string
+	Artist  string
+	Album   string
+	Year    int
+	Found   bool
+	AddedAt string
 }
 
 type IGoogleSheetsClient interface {
@@ -51,72 +40,21 @@ type IGoogleSheetsClient interface {
 }
 
 type GoogleSheetsClient struct {
-	sheetsService   *sheets.Service
-	parsedVideos    []ParsedVideo
-	ParsedVideosMap map[string]bool
-	missingTracks   []MissingTrack
+	sheetsService    *sheets.Service
+	ScrapedTracks    []ScrapedTrackRow
+	ScrapedTracksMap map[string]bool
 }
 
-func (gs *GoogleSheetsClient) LoadMissingTracks() {
-	sheetRange := MissingTrackSheet.Name + "!" + MissingTrackSheet.AllRowRange
-
-	resp, err := gs.sheetsService.Spreadsheets.Values.
-		Get(SpreadsheetId, sheetRange).
-		Do()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("got rows: %d\n", len(resp.Values))
-
-	for _, row := range resp.Values {
-
-		spotifyIds := ""
-		if len(row) >= 6 {
-			spotifyIds = row[5].(string)
-		}
-
-		t := MissingTrack{
-			Id:         row[0].(string),
-			Name:       row[1].(string),
-			Artist:     row[2].(string),
-			Date:       row[3].(string),
-			Link:       row[4].(string),
-			SpotifyIds: spotifyIds,
-		}
-
-		gs.missingTracks = append(gs.missingTracks, t)
-	}
-}
-
-func (gs *GoogleSheetsClient) LoadParsedVideos() {
-	sheetRange := ParsedVideosSheet.Name + "!" + ParsedVideosSheet.AllRowRange
-
-	resp, err := gs.sheetsService.Spreadsheets.Values.
-		Get(SpreadsheetId, sheetRange).
-		Do()
-	if err != nil {
-		panic(err)
-	}
-
-	for _, row := range resp.Values {
-		v := ParsedVideo{
-			Id:          row[0].(string),
-			Title:       row[1].(string),
-			PublishedAt: row[2].(string),
-			TotalTracks: row[3].(string),
-		}
-
-		gs.parsedVideos = append(gs.parsedVideos, v)
-		gs.ParsedVideosMap[v.Id] = true
-	}
+type Secrets struct {
+	Email      string
+	PrivateKey string
 }
 
 // https://gist.github.com/karayel/1b915b61d3cf307ca23b14313848f3c4
-func NewClient() GoogleSheetsClient {
+func NewClient(secrets Secrets) GoogleSheetsClient {
 	conf := &jwt.Config{
-		Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
-		PrivateKey: []byte(os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")),
+		Email:      secrets.Email,
+		PrivateKey: []byte(secrets.PrivateKey),
 		TokenURL:   "https://oauth2.googleapis.com/token",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/spreadsheets",
@@ -131,8 +69,45 @@ func NewClient() GoogleSheetsClient {
 	}
 
 	return GoogleSheetsClient{
-		sheetsService:   sheetsService,
-		parsedVideos:    []ParsedVideo{},
-		ParsedVideosMap: map[string]bool{},
+		sheetsService: sheetsService,
+	}
+}
+
+func (gs *GoogleSheetsClient) LoadScrapedTracks() {
+	sheetRange := ScrapedTracksSheet.Name + "!" + ScrapedTracksSheet.AllRowRange
+
+	resp, err := gs.sheetsService.Spreadsheets.Values.
+		Get(SpreadsheetId, sheetRange).
+		Do()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, row := range resp.Values {
+		yearStr := row[3].(string)
+		year, err := strconv.Atoi(yearStr)
+		if err != nil {
+			year = -1
+		}
+
+		r := ScrapedTrackRow{
+			Id:      "",
+			Title:   row[0].(string),
+			Artist:  row[1].(string),
+			Album:   row[2].(string),
+			Year:    year,
+			Found:   strings.ToUpper(row[4].(string)) == "TRUE",
+			AddedAt: row[5].(string),
+		}
+
+		r.Id = util.MakeTrackId(util.IdParts{
+			Title:  r.Title,
+			Artist: r.Artist,
+			Album:  r.Album,
+			Year:   yearStr,
+		})
+
+		gs.ScrapedTracks = append(gs.ScrapedTracks, r)
+		gs.ScrapedTracksMap[r.Id] = true
 	}
 }

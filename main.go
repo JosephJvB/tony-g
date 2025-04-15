@@ -2,26 +2,38 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"time"
 	"tony-gony/internal/googlesheets"
-	"tony-gony/internal/youtube"
+	"tony-gony/internal/scraping"
 )
 
 func main() {
-	yt := youtube.NewClient()
-	gs := googlesheets.NewClient()
+	sc := scraping.NewClient()
 
-	yt.LoadPlaylistItems("")
-	gs.LoadParsedVideos()
+	thisYear := time.Now().Year()
+	sc.LoadTracksForYear(thisYear)
 
-	toParse := []youtube.PlaylistItem{}
-	for _, video := range yt.PlaylistItems {
-		if !gs.ParsedVideosMap[video.Id] {
-			toParse = append(toParse, video)
+	gs := googlesheets.NewClient(googlesheets.Secrets{
+		// TODO: from parameter store
+		Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
+		PrivateKey: os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY"),
+	})
+	gs.LoadScrapedTracks()
+
+	toLookup := []scraping.ScrapedTrack{}
+	for _, t := range sc.TracksByYear[thisYear] {
+		if !gs.ScrapedTracksMap[t.Id] {
+			toLookup = append(toLookup, t)
 		}
 	}
 
-	if len(toParse) == 0 {
-		fmt.Println("No new videos to parse. Exiting")
-		return
-	}
+	fmt.Printf("you gotta find %d tracks\n", len(toLookup))
+
+	// then lookup those tracks in spotify
+	// then get my spotify playlists
+	// then create one if not exists
+	// then add found tracks to spotify playlist if not already in there
+	// then mark tracks as found / not
+	// then update scraped tracks google sheet
 }

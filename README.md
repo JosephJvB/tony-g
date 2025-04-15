@@ -53,6 +53,11 @@ nah wait apple music api is garbage
 lets do it this way:
 scrape https://theneedledrop.com/loved-list/${year}
 
+- years >= 2022 use apple playlists
+- years < 2022 use spotify or nothing at all
+- with this one, I'm gonna just handle future playlists
+  - maybe recreate playlists from 2022 onwards too with new name and decommish the old service
+
 find the apple music link in html:
 https://embed.music.apple.com/us/playlist/my-fav-singles-of-2024/pl.u-e2ZmtK9VM5K?wmode=opaque
 
