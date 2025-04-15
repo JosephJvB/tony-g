@@ -15,6 +15,7 @@ type ScrapedTrack struct {
 	Artist     string
 	Album      string
 	DurationMs int
+	Year       int
 }
 
 type AppleTrackListItem struct {
@@ -80,6 +81,7 @@ func (sc *ScrapingClient) LoadTracksForYear(year int) {
 			Album:  t.Album,
 			Year:   yearStr,
 		})
+		trackList[i].Year = year
 	}
 
 	sc.TracksByYear[year] = trackList
@@ -119,7 +121,7 @@ func scrapeTrackListFromApple(playlistUrl string) []ScrapedTrack {
 		serverData := []AppleServerData{}
 		json.Unmarshal([]byte(e.Text), &serverData)
 
-		trackList = getTracklistFromServerData(serverData)
+		trackList = getTracksFromServerData(serverData)
 	})
 
 	c.Visit(playlistUrl)
@@ -129,31 +131,30 @@ func scrapeTrackListFromApple(playlistUrl string) []ScrapedTrack {
 }
 
 // I could(should) test it separate if I wanted
-func getTracklistFromServerData(serverData []AppleServerData) []ScrapedTrack {
-	appleTrackList := []AppleTrackListItem{}
+func getTracksFromServerData(serverData []AppleServerData) []ScrapedTrack {
 	for _, serverDataItem := range serverData {
 		if serverDataItem.Intent.ContentDescriptor.Kind == "playlist" {
 			for _, contentSection := range serverDataItem.Data.Sections {
 				if contentSection.ItemKind == "trackLockup" {
-					appleTrackList = contentSection.Items
+					// is this the right way to find an item in a slice?
+					return parseAppleTracklists(contentSection.Items)
 				}
 			}
 		}
 	}
 
-	trackList := []ScrapedTrack{}
-	for _, appleTrack := range appleTrackList {
-		album := ""
-		for _, link := range appleTrack.TertiaryLinks {
-			if link.Segue.Destination.ContentDescriptor.Kind == "album" {
-				album = link.Title
-			}
-		}
+	// no super happy to return empty struct
+	return []ScrapedTrack{}
+}
 
+func parseAppleTracklists(items []AppleTrackListItem) []ScrapedTrack {
+	trackList := []ScrapedTrack{}
+
+	for _, appleTrack := range items {
 		t := ScrapedTrack{
 			Title:      appleTrack.Title,
 			Artist:     appleTrack.ArtistName,
-			Album:      album,
+			Album:      getAlbumName(appleTrack),
 			DurationMs: appleTrack.Duration,
 		}
 
@@ -161,4 +162,14 @@ func getTracklistFromServerData(serverData []AppleServerData) []ScrapedTrack {
 	}
 
 	return trackList
+}
+
+func getAlbumName(t AppleTrackListItem) string {
+	for _, link := range t.TertiaryLinks {
+		if link.Segue.Destination.ContentDescriptor.Kind == "album" {
+			return link.Title
+		}
+	}
+
+	return ""
 }

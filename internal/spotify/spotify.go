@@ -5,8 +5,9 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
+	"strconv"
 	"strings"
+	"tony-gony/internal/scraping"
 )
 
 const ApiBaseUrl = "https://api.spotify.com/v1"
@@ -26,11 +27,17 @@ type SpotifyClient struct {
 	tonyPlaylists []SpotifyPlaylist
 }
 
-func NewClient() SpotifyClient {
+type Secrets struct {
+	ClientId     string
+	ClientSecret string
+	RefreshToken string
+}
+
+func NewClient(secrets Secrets) SpotifyClient {
 	return SpotifyClient{
-		clientId:      os.Getenv("SPOTIFY_CLIENT_ID"),
-		clientSecret:  os.Getenv("SPOTIFY_CLIENT_SECRET"),
-		refreshToken:  os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		clientId:      secrets.ClientId,
+		clientSecret:  secrets.ClientSecret,
+		refreshToken:  secrets.RefreshToken,
 		tonyPlaylists: []SpotifyPlaylist{},
 	}
 }
@@ -88,10 +95,27 @@ func (s *SpotifyClient) LoadAccessToken() {
 	s.accessToken = tokenResponse.AccessToken
 }
 
-func (s *SpotifyClient) LoadTonyPlaylists() {
-	if s.accessToken == "" {
-		s.LoadAccessToken()
+func (s *SpotifyClient) GetPlaylistByName(name string) SpotifyPlaylist {
+	if len(s.tonyPlaylists) == 0 {
+		if s.accessToken == "" {
+			s.LoadAccessToken()
+		}
+
+		s.tonyPlaylists = getPlaylists(s.accessToken)
 	}
+
+	// again is this return OK
+	for _, p := range s.tonyPlaylists {
+		if p.Name == name {
+			return p
+		}
+	}
+
+	// feels kinda garbage
+	return SpotifyPlaylist{}
+}
+
+func getPlaylists(token string) []SpotifyPlaylist {
 
 	apiUrl := ApiBaseUrl + "/me/playlists"
 
@@ -100,15 +124,9 @@ func (s *SpotifyClient) LoadTonyPlaylists() {
 
 	apiUrl += "?" + queryPart.Encode()
 
-	playlists := getPaginatedItems[SpotifyPlaylist](apiUrl, s.accessToken)
+	playlists := getPaginatedItems[SpotifyPlaylist](apiUrl, token)
 
-	for _, playlist := range playlists {
-		isTony := strings.HasPrefix(playlist.Name, TonyPlaylistPrefix)
-
-		if isTony {
-			s.tonyPlaylists = append(s.tonyPlaylists, playlist)
-		}
-	}
+	return playlists
 }
 
 func getPaginatedItems[T any](startUrl string, token string) []T {
@@ -151,4 +169,43 @@ func (s *SpotifyClient) GetPlaylistItems(playlistId string) []SpotifyPlaylistIte
 	items := getPaginatedItems[SpotifyPlaylistItem](apiUrl, s.accessToken)
 
 	return items
+}
+
+func (s *SpotifyClient) FindTrack(t scraping.ScrapedTrack) []SpotifyTrack {
+	if s.accessToken == "" {
+		s.LoadAccessToken()
+	}
+
+	trackQuery := "track:" + t.Title
+	trackQuery += " artist:" + t.Artist
+	trackQuery += " year:" + strconv.Itoa(t.Year)
+	if t.Album != "" {
+		trackQuery += " album:" + t.Album
+	}
+
+	queryPart := url.Values{}
+	queryPart.Set("q", trackQuery)
+	queryPart.Set("type", "track")
+	queryPart.Set("limit", "1")
+
+	apiUrl := ApiBaseUrl + "/search?" + queryPart.Encode()
+
+	req, _ := http.NewRequest("GET", apiUrl, nil)
+
+	authHeaderValue := "Bearer " + s.accessToken
+	req.Header.Set("Authorization", authHeaderValue)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+
+	if resp.StatusCode > 299 {
+		log.Fatalf("\nFindTrack failed: \"%s\"\n%s\n", resp.Status, apiUrl)
+	}
+
+	trackResponse := SpotifyTrackSearchResults{}
+	json.NewDecoder(resp.Body).Decode(&trackResponse)
+
+	return trackResponse.Tracks.Items
 }
