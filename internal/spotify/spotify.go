@@ -14,17 +14,17 @@ const ApiBaseUrl = "https://api.spotify.com/v1"
 const AccountsBaseUrl = "https://accounts.spotify.com/api"
 
 type ISpotifyClient interface {
-	LoadBasicToken()
-	LoadMyPlaylists()
+	loadBasicToken()
+	loadAccessToken()
+	GetMyPlaylists()
 }
 
 type SpotifyClient struct {
-	clientId      string
-	clientSecret  string
-	refreshToken  string
-	basicToken    string
-	accessToken   string
-	tonyPlaylists []SpotifyPlaylist
+	clientId     string
+	clientSecret string
+	refreshToken string
+	basicToken   string
+	accessToken  string
 }
 
 type Secrets struct {
@@ -35,14 +35,13 @@ type Secrets struct {
 
 func NewClient(secrets Secrets) SpotifyClient {
 	return SpotifyClient{
-		clientId:      secrets.ClientId,
-		clientSecret:  secrets.ClientSecret,
-		refreshToken:  secrets.RefreshToken,
-		tonyPlaylists: []SpotifyPlaylist{},
+		clientId:     secrets.ClientId,
+		clientSecret: secrets.ClientSecret,
+		refreshToken: secrets.RefreshToken,
 	}
 }
 
-func (s *SpotifyClient) LoadBasicToken() {
+func (s *SpotifyClient) loadBasicToken() {
 	apiUrl := AccountsBaseUrl + "/token"
 
 	data := url.Values{}
@@ -67,7 +66,7 @@ func (s *SpotifyClient) LoadBasicToken() {
 	s.basicToken = tokenResponse.AccessToken
 }
 
-func (s *SpotifyClient) LoadAccessToken() {
+func (s *SpotifyClient) loadAccessToken() {
 	apiUrl := AccountsBaseUrl + "/token"
 
 	data := url.Values{}
@@ -95,28 +94,10 @@ func (s *SpotifyClient) LoadAccessToken() {
 	s.accessToken = tokenResponse.AccessToken
 }
 
-func (s *SpotifyClient) GetPlaylistByName(name string) SpotifyPlaylist {
-	if len(s.tonyPlaylists) == 0 {
-		if s.accessToken == "" {
-			s.LoadAccessToken()
-		}
-
-		s.tonyPlaylists = getPlaylists(s.accessToken)
+func (s *SpotifyClient) GetMyPlaylists() []SpotifyPlaylist {
+	if s.accessToken == "" {
+		s.loadAccessToken()
 	}
-
-	// again is this return OK
-	for _, p := range s.tonyPlaylists {
-		if p.Name == name {
-			return p
-		}
-	}
-
-	// feels kinda garbage
-	// maybe this instead: https://stackoverflow.com/questions/2050391/how-to-check-if-a-map-contains-a-key-in-go
-	return SpotifyPlaylist{}
-}
-
-func getPlaylists(token string) []SpotifyPlaylist {
 
 	apiUrl := ApiBaseUrl + "/me/playlists"
 
@@ -125,7 +106,7 @@ func getPlaylists(token string) []SpotifyPlaylist {
 
 	apiUrl += "?" + queryPart.Encode()
 
-	playlists := getPaginatedItems[SpotifyPlaylist](apiUrl, token)
+	playlists := getPaginatedItems[SpotifyPlaylist](apiUrl, s.accessToken)
 
 	return playlists
 }
@@ -162,7 +143,7 @@ func getPaginatedItems[T any](startUrl string, token string) []T {
 
 func (s *SpotifyClient) GetPlaylistItems(playlistId string) []SpotifyPlaylistItem {
 	if s.accessToken == "" {
-		s.LoadAccessToken()
+		s.loadAccessToken()
 	}
 
 	apiUrl := ApiBaseUrl + "/playlists/" + playlistId + "/tracks"
@@ -174,18 +155,20 @@ func (s *SpotifyClient) GetPlaylistItems(playlistId string) []SpotifyPlaylistIte
 
 func (s *SpotifyClient) FindTrack(t scraping.ScrapedTrack) []SpotifyTrack {
 	if s.accessToken == "" {
-		s.LoadAccessToken()
+		s.loadAccessToken()
 	}
 
 	trackQuery := "track:" + t.Title
 	trackQuery += " artist:" + t.Artist
 	trackQuery += " year:" + strconv.Itoa(t.Year)
-	if t.Album != "" {
-		// apple music adds " - EP" | " - Single" to album suffix sometimes
-		// I think that would break the spotify query
-		// could trim that, but prefer to remove it
-		// trackQuery += " album:" + t.Album
-	}
+	// Noticed cases where apple music adds " - EP" | " - Single" to album suffix
+	// and that doesn't match Spotify records
+	// So I think that would break the spotify query
+	// could trim those suffixes, but prefer to not use album at all
+	// trust that title and artist will be more consistent between apple/spotify
+	// if t.Album != "" {
+	// trackQuery += " album:" + t.Album
+	// }
 
 	queryPart := url.Values{}
 	queryPart.Set("q", trackQuery)
@@ -212,4 +195,42 @@ func (s *SpotifyClient) FindTrack(t scraping.ScrapedTrack) []SpotifyTrack {
 	json.NewDecoder(resp.Body).Decode(&trackResponse)
 
 	return trackResponse.Tracks.Items
+}
+
+func (s *SpotifyClient) CreatePlaylist(name string) SpotifyPlaylist {
+	if s.accessToken == "" {
+		s.loadAccessToken()
+	}
+
+	apiUrl := ApiBaseUrl + "/users/" + JvbSpotifyId + "/playlists"
+
+	data := map[string]any{
+		"name":          name,
+		"description":   "",
+		"public":        true,
+		"collaborative": false,
+	}
+	dataStr, _ := json.Marshal(data)
+
+	postData := strings.NewReader(string(dataStr))
+
+	req, _ := http.NewRequest("POST", apiUrl, postData)
+
+	authHeaderValue := "Bearer " + s.accessToken
+	req.Header.Set("Authorization", authHeaderValue)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+
+	if resp.StatusCode > 299 {
+		log.Fatalf("\nCreatePlaylist failed: \"%s\"", resp.Status)
+	}
+
+	responseBody := SpotifyPlaylist{}
+	json.NewDecoder(resp.Body).Decode(&responseBody)
+
+	return responseBody
 }

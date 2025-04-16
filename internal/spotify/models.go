@@ -1,6 +1,7 @@
 package spotify
 
 const TonyPlaylistPrefix = "TONY'S TOP TRACKS #2 "
+const JvbSpotifyId = "xnmacgqaaa6a1xi7uy2k1fe7w"
 
 type SpotifyArtist struct {
 	Id   string `json:"id"`
