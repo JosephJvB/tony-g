@@ -106,28 +106,4 @@ func TestGoogleSheets(t *testing.T) {
 
 		gs.AddNextRows(toAdd)
 	})
-
-	t.Run("can sort the google sheet", func(t *testing.T) {
-		t.Skip("its not working lol")
-		t.Skip("skip test calling real google sheets api")
-
-		err := godotenv.Load("../../.env")
-		if err != nil {
-			panic(err)
-		}
-
-		// .env file does not handle private keys gracefully
-		// probably would be better saved to a file than in .env. Oh well.
-		invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
-		fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
-
-		os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
-
-		gs := NewClient(Secrets{
-			Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
-			PrivateKey: fixedKey,
-		})
-
-		gs.SortSheet()
-	})
 }

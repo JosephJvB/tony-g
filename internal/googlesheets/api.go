@@ -117,7 +117,7 @@ func (gs *GoogleSheetsClient) LoadScrapedTracks() {
 }
 
 func (gs *GoogleSheetsClient) AddNextRows(nextRows []ScrapedTrackRow) {
-	// sheets.ValueRange needs interfaces
+	// sheets.ValueRange.Values needs interfaces
 	rows := make([][]interface{}, len(nextRows))
 	for _, t := range nextRows {
 		r := make([]interface{}, 6)
@@ -150,56 +150,4 @@ func (gs *GoogleSheetsClient) AddNextRows(nextRows []ScrapedTrackRow) {
 
 	fmt.Printf("updated range: \"%s\"\n", resp.Updates.UpdatedRange)
 	fmt.Printf("tableRange: \"%s\"\n", resp.TableRange)
-}
-
-// not working idk these pointers!
-// maybe solve it with apps script instead?
-func (gs *GoogleSheetsClient) SortSheet() {
-	rowRange := ScrapedTracksSheet.Name + "!" + ScrapedTracksSheet.AllRowRange
-	resp1, err := gs.sheetsService.Spreadsheets.Values.Get(SpreadsheetId, rowRange).Do()
-	if err != nil {
-		panic(err)
-	}
-
-	rowCount := len(resp1.Values)
-	gridRange := sheets.GridRange{
-		SheetId:          int64(ScrapedTracksSheet.Id),
-		StartRowIndex:    1,
-		EndRowIndex:      int64(rowCount),
-		StartColumnIndex: 0,
-		EndColumnIndex:   5,
-	}
-	sortYear := sheets.SortSpec{
-		DimensionIndex: 3,
-		SortOrder:      "DESCENDING",
-	}
-	sortAddedAt := sheets.SortSpec{
-		DimensionIndex: 5,
-		SortOrder:      "DESCENDING",
-	}
-	sortSpecs := []*sheets.SortSpec{
-		&sortYear,
-		&sortAddedAt,
-	}
-	sortRange := sheets.SortRangeRequest{
-		Range:     &gridRange,
-		SortSpecs: sortSpecs,
-	}
-	r := sheets.Request{
-		SortRange: &sortRange,
-	}
-	req := sheets.BatchUpdateSpreadsheetRequest{
-		Requests: []*sheets.Request{
-			&r,
-		},
-	}
-
-	resp2, err := gs.sheetsService.Spreadsheets.BatchUpdate(SpreadsheetId, &req).Do()
-	if err != nil {
-		b, _ := resp2.MarshalJSON()
-		fmt.Println(string(b))
-		panic(err)
-	}
-
-	fmt.Printf("add sorting response: %d", resp2.HTTPStatusCode)
 }
