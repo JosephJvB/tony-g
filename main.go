@@ -24,9 +24,10 @@ func main() {
 	})
 	gs.LoadScrapedTracks()
 
-	// don't lookup tracks from prev batch
+	// don't lookup tracks if they're already in Google Sheets
 	toLookup := []scraping.ScrapedTrack{}
 	for _, t := range scrapedTracks {
+		// keyed by custom id. See `util.go`
 		if !gs.ScrapedTracksMap[t.Id] {
 			toLookup = append(toLookup, t)
 		}
@@ -71,9 +72,10 @@ func main() {
 		}
 	}
 
+	// keyed by spotify track id
 	currentTrackMap := map[string]bool{}
 	if !ok {
-		// tonyPlaylist = spc.CreatePlaylist(tonyPlaylistName)
+		tonyPlaylist = spc.CreatePlaylist(tonyPlaylistName)
 	} else {
 		currentTracks := spc.GetPlaylistItems(tonyPlaylist.Id)
 		for _, t := range currentTracks {
