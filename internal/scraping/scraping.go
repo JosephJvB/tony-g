@@ -9,65 +9,21 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-type ScrapedTrack struct {
-	Id         string
-	Title      string
-	Artist     string
-	Album      string
-	DurationMs int
-	Year       int
-}
-
-type AppleTrackListItem struct {
-	Title         string `json:"title"`
-	ArtistName    string `json:"artistName"`
-	Duration      int    `json:"duration"`
-	TertiaryLinks []struct {
-		Title string `json:"title"`
-		Segue struct {
-			Destination struct {
-				ContentDescriptor struct {
-					Kind string `json:"kind"`
-				} `json:"contentDescriptor"`
-			} `json:"destination"`
-		} `json:"segue"`
-	} `json:"tertiaryLinks"`
-}
-type AppleServerData struct {
-	Intent struct {
-		ContentDescriptor struct {
-			Kind string `json:"kind"`
-		} `json:"contentDescriptor"`
-	} `json:"intent"`
-	Data struct {
-		Sections []struct {
-			Id       string               `json:"id"`
-			ItemKind string               `json:"itemKind"`
-			Items    []AppleTrackListItem `json:"items"`
-		} `json:"sections"`
-	} `json:"data"`
-}
-
+// don't really need a client
+// but I guess consistency with other internal API's?
 type IScrapingClient interface {
 	LoadTracksForYear(year int)
 }
-
-type ScrapingClient struct {
-	TracksByYear map[int][]ScrapedTrack
-}
+type ScrapingClient struct{}
 
 func NewClient() ScrapingClient {
-	return ScrapingClient{
-		TracksByYear: map[int][]ScrapedTrack{},
-	}
+	return ScrapingClient{}
 }
 
-func (sc *ScrapingClient) LoadTracksForYear(year int) {
-	sc.TracksByYear[year] = []ScrapedTrack{}
-
+func (sc *ScrapingClient) GetTracksForYear(year int) []ScrapedTrack {
 	playlistUrl := scrapeApplePlaylistUrlFromTony(year)
 	if playlistUrl == "" {
-		return
+		return []ScrapedTrack{}
 	}
 
 	trackList := scrapeTrackListFromApple(playlistUrl)
@@ -84,7 +40,7 @@ func (sc *ScrapingClient) LoadTracksForYear(year int) {
 		trackList[i].Year = year
 	}
 
-	sc.TracksByYear[year] = trackList
+	return trackList
 }
 
 // someone recommended this tutorial
@@ -130,20 +86,19 @@ func scrapeTrackListFromApple(playlistUrl string) []ScrapedTrack {
 	return trackList
 }
 
-// I could(should) test it separate if I wanted
 func getTracksFromServerData(serverData []AppleServerData) []ScrapedTrack {
 	for _, serverDataItem := range serverData {
 		if serverDataItem.Intent.ContentDescriptor.Kind == "playlist" {
 			for _, contentSection := range serverDataItem.Data.Sections {
 				if contentSection.ItemKind == "trackLockup" {
-					// is this the right way to find an item in a slice?
 					return parseAppleTracklists(contentSection.Items)
 				}
 			}
 		}
 	}
 
-	// no super happy to return empty struct
+	// not super happy to return empty struct
+	// but in this case it's an empty list so that feels less bad
 	return []ScrapedTrack{}
 }
 

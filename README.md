@@ -60,6 +60,7 @@ scrape https://theneedledrop.com/loved-list/${year}
 
 find the apple music link in html:
 https://embed.music.apple.com/us/playlist/my-fav-singles-of-2024/pl.u-e2ZmtK9VM5K?wmode=opaque
+https://music.apple.com/us/playlist/my-fav-singles-of-2024/pl.u-e2ZmtK9VM5K
 
 scrape the apple music playlist page for tracks: songname, artist, album
 
