@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"slices"
 	"strconv"
 	"time"
 	"tony-gony/internal/googlesheets"
@@ -91,9 +90,5 @@ func main() {
 
 	spc.AddPlaylistItems(tonyPlaylist.Id, toAdd)
 
-	// add next rows to front
-	slices.Reverse(nextRows)
-	nextRows = append(nextRows, gs.ScrapedTracks...)
-
-	gs.SetScrapedTracks(nextRows)
+	gs.AddNextRows(nextRows)
 }
