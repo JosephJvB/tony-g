@@ -2,10 +2,12 @@ package youtube
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 )
 
 const BaseUrl = "https://www.googleapis.com/youtube/v3"
@@ -73,6 +75,9 @@ func getPlaylistItems(key string, playlistId string, pageToken string) ApiRespon
 	defer resp.Body.Close()
 
 	if resp.StatusCode > 299 {
+		b := new(strings.Builder)
+		io.Copy(b, resp.Body)
+		log.Print(b.String())
 		log.Fatalf("\ngetPlaylistItems failed: \"%s\"", resp.Status)
 	}
 

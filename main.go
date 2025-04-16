@@ -82,10 +82,10 @@ func main() {
 		}
 	}
 
-	toAdd := []spotify.SpotifyTrack{}
+	toAdd := []string{}
 	for _, t := range foundTracks {
 		if !currentTrackMap[t.Id] {
-			toAdd = append(toAdd, t)
+			toAdd = append(toAdd, t.Uri)
 		}
 	}
 

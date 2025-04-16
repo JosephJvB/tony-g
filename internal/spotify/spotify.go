@@ -2,6 +2,7 @@ package spotify
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -57,6 +58,9 @@ func (s *SpotifyClient) loadBasicToken() {
 	}
 
 	if resp.StatusCode > 299 {
+		b := new(strings.Builder)
+		io.Copy(b, resp.Body)
+		log.Print(b.String())
 		log.Fatalf("\nLoadBasicToken failed: \"%s\"", resp.Status)
 	}
 
@@ -85,6 +89,9 @@ func (s *SpotifyClient) loadAccessToken() {
 	}
 
 	if resp.StatusCode > 299 {
+		b := new(strings.Builder)
+		io.Copy(b, resp.Body)
+		log.Print(b.String())
 		log.Fatalf("\nLoadAccessToken failed: \"%s\"", resp.Status)
 	}
 
@@ -128,6 +135,9 @@ func getPaginatedItems[T any](startUrl string, token string) []T {
 		}
 
 		if resp.StatusCode > 299 {
+			b := new(strings.Builder)
+			io.Copy(b, resp.Body)
+			log.Print(b.String())
 			log.Fatalf("\ngetPaginatedItems failed: \"%s\"\n%s\n", resp.Status, apiUrl)
 		}
 
@@ -188,6 +198,9 @@ func (s *SpotifyClient) FindTrack(t scraping.ScrapedTrack) []SpotifyTrack {
 	}
 
 	if resp.StatusCode > 299 {
+		b := new(strings.Builder)
+		io.Copy(b, resp.Body)
+		log.Print(b.String())
 		log.Fatalf("\nFindTrack failed: \"%s\"\n%s\n", resp.Status, apiUrl)
 	}
 
@@ -206,13 +219,12 @@ func (s *SpotifyClient) CreatePlaylist(name string) SpotifyPlaylist {
 
 	data := map[string]any{
 		"name":          name,
-		"description":   "",
+		"description":   "", // TODO: description
 		"public":        true,
 		"collaborative": false,
 	}
-	dataStr, _ := json.Marshal(data)
-
-	postData := strings.NewReader(string(dataStr))
+	b, _ := json.Marshal(data)
+	postData := strings.NewReader(string(b))
 
 	req, _ := http.NewRequest("POST", apiUrl, postData)
 
@@ -226,6 +238,9 @@ func (s *SpotifyClient) CreatePlaylist(name string) SpotifyPlaylist {
 	}
 
 	if resp.StatusCode > 299 {
+		b := new(strings.Builder)
+		io.Copy(b, resp.Body)
+		log.Print(b.String())
 		log.Fatalf("\nCreatePlaylist failed: \"%s\"", resp.Status)
 	}
 
@@ -233,4 +248,49 @@ func (s *SpotifyClient) CreatePlaylist(name string) SpotifyPlaylist {
 	json.NewDecoder(resp.Body).Decode(&responseBody)
 
 	return responseBody
+}
+
+func (s *SpotifyClient) AddPlaylistItems(playlistId string, trackUris []string) {
+	if s.accessToken == "" {
+		s.loadAccessToken()
+	}
+
+	apiUrl := ApiBaseUrl + "/playlists/" + playlistId + "/tracks"
+
+	l := len(trackUris)
+
+	for i := 0; i < l; i += 100 {
+		// there is a math.Min() method but it takes floats
+		// so i need to convert to float then from float, sack that off
+		upper := i + 100
+		if upper > l {
+			upper = l
+		}
+
+		uris := trackUris[i:upper]
+
+		data := map[string]any{
+			"uris": uris,
+		}
+		b, _ := json.Marshal(data)
+		postData := strings.NewReader(string(b))
+
+		req, _ := http.NewRequest("POST", apiUrl, postData)
+
+		authHeaderValue := "Bearer " + s.accessToken
+		req.Header.Set("Authorization", authHeaderValue)
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			panic(err)
+		}
+
+		if resp.StatusCode > 299 {
+			b := new(strings.Builder)
+			io.Copy(b, resp.Body)
+			log.Print(b.String())
+			log.Fatalf("\nAddPlaylistItems failed: \"%s\"", resp.Status)
+		}
+	}
 }

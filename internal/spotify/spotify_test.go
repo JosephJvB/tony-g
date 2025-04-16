@@ -146,4 +146,27 @@ func TestSpotify(t *testing.T) {
 			t.Error("Failed to create playlist")
 		}
 	})
+
+	t.Run("can add items to a playlist", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+
+		playlistId := "2bNqL6lXSzg7rZlTxDl117"
+		trackUris := []string{
+			"spotify:track:0AO3ejChi1gRBWvUDMH2kg",
+			"spotify:track:7LXN0LffItjMb9bq61htdB",
+		}
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		s.AddPlaylistItems(playlistId, trackUris)
+	})
 }
