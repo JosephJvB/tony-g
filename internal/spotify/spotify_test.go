@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"testing"
+	"tony-gony/internal/scraping"
 
 	"github.com/joho/godotenv"
 )
@@ -168,5 +169,73 @@ func TestSpotify(t *testing.T) {
 		})
 
 		s.AddPlaylistItems(playlistId, trackUris)
+	})
+
+	t.Run("can find My Golden Years", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(scraping.ScrapedTrack{
+			Title:  "My Golden Years",
+			Artist: "The Lemon Twigs",
+			Year:   2025,
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: My Golden Years")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	t.Run("can find Somethin'", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(scraping.ScrapedTrack{
+			Title:  "Somethin' (feat. Sexyy Red)",
+			Artist: "Nardo Wick",
+			Year:   2025,
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: Somethin'")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
 	})
 }

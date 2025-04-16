@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"tony-gony/internal/scraping"
 )
@@ -170,7 +169,11 @@ func (s *SpotifyClient) FindTrack(t scraping.ScrapedTrack) []SpotifyTrack {
 
 	trackQuery := "track:" + t.Title
 	trackQuery += " artist:" + t.Artist
-	trackQuery += " year:" + strconv.Itoa(t.Year)
+	// year is a bit sketchy
+	// mostly should be fine
+	// but if it's january - maybe Tony's added songs from previous year?
+	// found that with "My Golden Years - Lemon Twigs"
+	// trackQuery += " year:" + strconv.Itoa(t.Year)
 	// Noticed cases where apple music adds " - EP" | " - Single" to album suffix
 	// and that doesn't match Spotify records
 	// So I think that would break the spotify query
