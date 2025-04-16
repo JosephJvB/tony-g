@@ -13,11 +13,10 @@ import (
 
 func main() {
 	timestamp := time.Now().Format(time.RFC3339)
+	thisYear := time.Now().Year()
 
 	sc := scraping.NewClient()
-
-	thisYear := time.Now().Year()
-	sc.LoadTracksForYear(thisYear)
+	scrapedTracks := sc.GetTracksForYear(thisYear)
 
 	gs := googlesheets.NewClient(googlesheets.Secrets{
 		// TODO: from parameter store
@@ -26,8 +25,9 @@ func main() {
 	})
 	gs.LoadScrapedTracks()
 
+	// don't lookup tracks from prev batch
 	toLookup := []scraping.ScrapedTrack{}
-	for _, t := range sc.TracksByYear[thisYear] {
+	for _, t := range scrapedTracks {
 		if !gs.ScrapedTracksMap[t.Id] {
 			toLookup = append(toLookup, t)
 		}
@@ -61,10 +61,19 @@ func main() {
 	}
 
 	tonyPlaylistName := spotify.TonyPlaylistPrefix + strconv.Itoa(thisYear)
-	tonyPlaylist := spc.GetPlaylistByName(tonyPlaylistName)
+	myPlaylists := spc.GetMyPlaylists()
+	// choosing this as my pattern for handling struct not found in list
+	// copying `value, ok := dict["key"] access`
+	tonyPlaylist, ok := spotify.SpotifyPlaylist{}, false
+	for _, p := range myPlaylists {
+		if p.Name == tonyPlaylistName {
+			tonyPlaylist = p
+			ok = true
+		}
+	}
 
 	currentTrackMap := map[string]bool{}
-	if tonyPlaylist.Id == "" {
+	if !ok {
 		// tonyPlaylist = spc.CreatePlaylist(tonyPlaylistName)
 	} else {
 		currentTracks := spc.GetPlaylistItems(tonyPlaylist.Id)
