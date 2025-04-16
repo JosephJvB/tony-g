@@ -24,6 +24,12 @@ func main() {
 	})
 	gs.LoadScrapedTracks()
 
+	fmt.Printf(
+		"scraped %d tracks from tonys %d apple music playlist\n",
+		len(gs.ScrapedTracksMap),
+		thisYear,
+	)
+
 	// don't lookup tracks if they're already in Google Sheets
 	toLookup := []scraping.ScrapedTrack{}
 	for _, t := range scrapedTracks {
@@ -60,6 +66,8 @@ func main() {
 		})
 	}
 
+	fmt.Printf("found %d/%d tracks\n", len(foundTracks), len(toLookup))
+
 	tonyPlaylistName := spotify.TonyPlaylistPrefix + strconv.Itoa(thisYear)
 	myPlaylists := spc.GetMyPlaylists()
 	// choosing this as my pattern for handling struct not found in list
@@ -72,6 +80,8 @@ func main() {
 		}
 	}
 
+	fmt.Printf("spotify playlist for %d exists: %t\n", thisYear, ok)
+
 	// keyed by spotify track id
 	currentTrackMap := map[string]bool{}
 	if !ok {
@@ -83,6 +93,8 @@ func main() {
 		}
 	}
 
+	fmt.Printf("%d tracks already in %d playlist", len(currentTrackMap), thisYear)
+
 	toAdd := []string{}
 	for _, t := range foundTracks {
 		if !currentTrackMap[t.Id] {
@@ -90,7 +102,11 @@ func main() {
 		}
 	}
 
+	fmt.Printf("adding %d tracks to %d playlist", len(toAdd), thisYear)
+
 	spc.AddPlaylistItems(tonyPlaylist.Id, toAdd)
+
+	fmt.Printf("adding %d rows to scraped google sheet", len(nextRows))
 
 	gs.AddNextRows(nextRows)
 }
