@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 	"strings"
-	util "tony-gony/internal"
+	util "tony-gony/internal/util"
 
 	"github.com/gocolly/colly/v2"
 )

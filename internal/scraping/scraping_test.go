@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	util "tony-gony/internal"
+	util "tony-gony/internal/util"
 )
 
 func TestScraping(t *testing.T) {

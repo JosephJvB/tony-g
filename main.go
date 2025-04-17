@@ -9,6 +9,7 @@ import (
 	"tony-gony/internal/googlesheets"
 	"tony-gony/internal/scraping"
 	"tony-gony/internal/spotify"
+	"tony-gony/internal/util"
 
 	"github.com/joho/godotenv"
 )
@@ -77,6 +78,17 @@ func main() {
 	for i, t := range toLookup {
 		fmt.Printf("finding track %d/%d\r", i+1, len(toLookup))
 		results := spc.FindTrack(t)
+
+		// on first failure - try normalize track title
+		if len(results) == 0 {
+			withoutFeatureStr := util.RemoveFeatureString(t.Title)
+			if withoutFeatureStr != t.Title {
+				t2 := t
+				t2.Title = withoutFeatureStr
+				results = spc.FindTrack(t2)
+			}
+		}
+
 		if len(results) > 0 {
 			foundTracks = append(foundTracks, results[0])
 		}
