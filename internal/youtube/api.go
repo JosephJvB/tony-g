@@ -13,9 +13,6 @@ import (
 const BaseUrl = "https://www.googleapis.com/youtube/v3"
 const PlaylistId = "PLP4CSgl7K7or84AAhr7zlLNpghEnKWu2c"
 
-type IYoutubeClient interface {
-	LoadPlaylistItems()
-}
 type YoutubeClient struct {
 	apiKey        string
 	PlaylistItems []PlaylistItem

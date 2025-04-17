@@ -35,11 +35,6 @@ type ScrapedTrackRow struct {
 	AddedAt string
 }
 
-type IGoogleSheetsClient interface {
-	LoadScrapedTracks()
-	AddNextRows()
-}
-
 type GoogleSheetsClient struct {
 	sheetsService    *sheets.Service
 	scrapedTracks    []ScrapedTrackRow

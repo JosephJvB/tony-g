@@ -13,12 +13,6 @@ import (
 const ApiBaseUrl = "https://api.spotify.com/v1"
 const AccountsBaseUrl = "https://accounts.spotify.com/api"
 
-type ISpotifyClient interface {
-	loadBasicToken()
-	loadAccessToken()
-	GetMyPlaylists()
-}
-
 type SpotifyClient struct {
 	clientId     string
 	clientSecret string

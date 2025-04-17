@@ -11,9 +11,6 @@ import (
 
 // don't really need a client
 // but I guess consistency with other internal API's?
-type IScrapingClient interface {
-	LoadTracksForYear(year int)
-}
 type ScrapingClient struct{}
 
 func NewClient() ScrapingClient {
