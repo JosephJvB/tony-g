@@ -167,7 +167,10 @@ func (s *SpotifyClient) FindTrack(t scraping.ScrapedTrack) []SpotifyTrack {
 		s.loadAccessToken()
 	}
 
+	// all tracks that couldn't be found have (feat. xxx) in the title
+	// maybe I need to do a fallback request with that part of the title excluded
 	trackQuery := "track:" + t.Title
+	// also I see some issues if there are multiple artists credited on a track
 	trackQuery += " artist:" + t.Artist
 	// year is a bit sketchy
 	// mostly should be fine
