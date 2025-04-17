@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Golang Spotty api'
+
+Parameters:
+  DEBUG:
+    Type: Boolean
+    Default: true
+    AllowedValues:
+      - true
+      - false
+
+Globals:
+  Function:
+    Timeout: 15
+    MemorySize: 128
+    # https://docs.aws.amazon.com/lambda/latest/dg/lambda-golang.html
+    Runtime: provided.al2023
+    Environment:
+      Variables:
+        DEBUG: !Ref DEBUG
+
+Resources:
+  RunDaTing:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: main.main
+      # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-template-list.html
+      Policies:
+        - SSMParameterWithSlashPrefixReadPolicy:
+            # TODO: does prefix* work? Or will I need to add one policy per parameter?
+            ParameterName: /Tony2Stack/*
+      Events:
+      # TODO on cron, saturday morning
+Outputs:
+  RunDaTing:
+    Description: it runs
+    Value: !Ref RunDaTing
