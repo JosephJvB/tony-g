@@ -71,3 +71,6 @@ find those tracks in spotify that I haven't tried to add
 get my spotify playlists and their items
 
 search in spotify for those tracks
+
+rather than scraping the playlist url every week should I save it in google sheets?
+We'll see

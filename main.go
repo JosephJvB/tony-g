@@ -4,11 +4,26 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 	"tony-gony/internal/googlesheets"
 	"tony-gony/internal/scraping"
 	"tony-gony/internal/spotify"
+
+	"github.com/joho/godotenv"
 )
+
+func init() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	}
+
+	invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
+	fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
+
+	os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
+}
 
 func main() {
 	timestamp := time.Now().Format(time.RFC3339)
@@ -16,6 +31,12 @@ func main() {
 
 	sc := scraping.NewClient()
 	scrapedTracks := sc.GetTracksForYear(thisYear)
+
+	fmt.Printf(
+		"scraped %d tracks apple music playlist:%d\n",
+		len(scrapedTracks),
+		thisYear,
+	)
 
 	gs := googlesheets.NewClient(googlesheets.Secrets{
 		// TODO: from parameter store
@@ -25,9 +46,8 @@ func main() {
 	gs.LoadScrapedTracks()
 
 	fmt.Printf(
-		"scraped %d tracks from tonys %d apple music playlist\n",
+		"loaded %d tracks from google sheets\n",
 		len(gs.ScrapedTracksMap),
-		thisYear,
 	)
 
 	// don't lookup tracks if they're already in Google Sheets
@@ -41,6 +61,10 @@ func main() {
 
 	fmt.Printf("you gotta find %d tracks\n", len(toLookup))
 
+	if len(toLookup) == 0 {
+		return
+	}
+
 	spc := spotify.NewClient(spotify.Secrets{
 		// TODO: from parameter store
 		ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
@@ -50,7 +74,8 @@ func main() {
 
 	nextRows := []googlesheets.ScrapedTrackRow{}
 	foundTracks := []spotify.SpotifyTrack{}
-	for _, t := range toLookup {
+	for i, t := range toLookup {
+		fmt.Printf("finding track %d/%d\r", i+1, len(toLookup))
 		results := spc.FindTrack(t)
 		if len(results) > 0 {
 			foundTracks = append(foundTracks, results[0])
@@ -66,7 +91,7 @@ func main() {
 		})
 	}
 
-	fmt.Printf("found %d/%d tracks\n", len(foundTracks), len(toLookup))
+	fmt.Printf("\nfound %d/%d tracks\n", len(foundTracks), len(toLookup))
 
 	tonyPlaylistName := spotify.TonyPlaylistPrefix + strconv.Itoa(thisYear)
 	myPlaylists := spc.GetMyPlaylists()
@@ -93,7 +118,7 @@ func main() {
 		}
 	}
 
-	fmt.Printf("%d tracks already in %d playlist", len(currentTrackMap), thisYear)
+	fmt.Printf("%d tracks already in %d playlist\n", len(currentTrackMap), thisYear)
 
 	toAdd := []string{}
 	for _, t := range foundTracks {
@@ -102,11 +127,11 @@ func main() {
 		}
 	}
 
-	fmt.Printf("adding %d tracks to %d playlist", len(toAdd), thisYear)
+	fmt.Printf("adding %d tracks to %d playlist\n", len(toAdd), thisYear)
 
 	spc.AddPlaylistItems(tonyPlaylist.Id, toAdd)
 
-	fmt.Printf("adding %d rows to scraped google sheet", len(nextRows))
+	fmt.Printf("adding %d rows to scraped google sheet\n", len(nextRows))
 
 	gs.AddNextRows(nextRows)
 }

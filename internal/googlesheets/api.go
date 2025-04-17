@@ -2,7 +2,6 @@ package googlesheets
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 	util "tony-gony/internal"
@@ -143,11 +142,5 @@ func (gs *GoogleSheetsClient) AddNextRows(nextRows []ScrapedTrackRow) {
 	req.ValueInputOption("RAW")
 	req.InsertDataOption("INSERT_ROWS")
 
-	resp, err := req.Do()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("updated range: \"%s\"\n", resp.Updates.UpdatedRange)
-	fmt.Printf("tableRange: \"%s\"\n", resp.TableRange)
+	req.Do()
 }
