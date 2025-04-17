@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-	"tony-gony/internal/aws/ssm"
 	"tony-gony/internal/googlesheets"
 	"tony-gony/internal/scraping"
 	"tony-gony/internal/spotify"
+	"tony-gony/internal/ssm"
 	"tony-gony/internal/util"
 )
 
