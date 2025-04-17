@@ -74,3 +74,18 @@ search in spotify for those tracks
 
 rather than scraping the playlist url every week should I save it in google sheets?
 We'll see
+
+deleted tony2 stack cos it would have found the new Tony #2 playlists due to prefix overlap
+I can change the prefix maybe but should be fine now that the old fn is not running
+
+just noticed too actually that the curated Apple Playlists are a lot shorter than the ones I made
+see: https://music.apple.com/us/playlist/my-fav-singles-of-2024/pl.u-e2ZmtK9VM5K
+vs: https://open.spotify.com/playlist/3cIeEpjP3PhNiFD6aKfyD6?si=a277b1e20a8043f7
+ie: Apple Playlists don't have every liked song from Youtube Best Tracks
+eep!
+Maybe I should keep my guy running!
+
+1. turn tony2 back online (delete web assets stack tho that's garbage)
+2. tony-gony needs a new prefix "2onys 2op 2racks 2024" ?
+
+- aso I should rename tony-gony to tony-g that's way better
