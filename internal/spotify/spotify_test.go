@@ -274,4 +274,40 @@ func TestSpotify(t *testing.T) {
 			panic(err)
 		}
 	})
+
+	t.Run("can find Times Is Rough'", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(scraping.ScrapedTrack{
+			// i think i gotta trim "(feat. ...)" and "[feat. ...]"
+			Title: "Times Is Rough (feat. Heem B$F & Rick Hyde)", // fails
+			// Title:  "Times Is Rough", // works
+			Artist: "Black Soprano Family, Benny the Butcher & DJ Premier",
+			Year:   2022,
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: FUNKFEST'")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
 }
