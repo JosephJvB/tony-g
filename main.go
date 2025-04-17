@@ -2,31 +2,19 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strconv"
-	"strings"
 	"time"
+	"tony-gony/internal/aws/ssm"
 	"tony-gony/internal/googlesheets"
 	"tony-gony/internal/scraping"
 	"tony-gony/internal/spotify"
 	"tony-gony/internal/util"
-
-	"github.com/joho/godotenv"
 )
 
-func init() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic(err)
-	}
-
-	invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
-	fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
-
-	os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
-}
-
 func main() {
+	paramClient := ssm.NewClient()
+	paramClient.LoadParameterValues()
+
 	timestamp := time.Now().Format(time.RFC3339)
 	thisYear := time.Now().Year()
 
@@ -40,9 +28,8 @@ func main() {
 	)
 
 	gs := googlesheets.NewClient(googlesheets.Secrets{
-		// TODO: from parameter store
-		Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
-		PrivateKey: os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY"),
+		Email:      paramClient.GoogleClientEmail.Value,
+		PrivateKey: paramClient.GooglePrivateKey.Value,
 	})
 	gs.LoadScrapedTracks()
 
@@ -67,10 +54,9 @@ func main() {
 	}
 
 	spc := spotify.NewClient(spotify.Secrets{
-		// TODO: from parameter store
-		ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
-		ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
-		RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		ClientId:     paramClient.SpotifyClientId.Value,
+		ClientSecret: paramClient.GoogleClientEmail.Value,
+		RefreshToken: paramClient.SpotifyRefreshToken.Value,
 	})
 
 	nextRows := []googlesheets.ScrapedTrackRow{}
