@@ -2,9 +2,9 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "tony-gony"
+stack_name = "tony-g"
 s3_bucket = "jvb-code-lndn"
-s3_prefix = "SAM/tony-gony"
+s3_prefix = "SAM/tony-g"
 region = "eu-west-2"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
