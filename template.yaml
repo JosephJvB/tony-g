@@ -12,7 +12,7 @@ Parameters:
 
 Globals:
   Function:
-    Timeout: 15
+    Timeout: 120
     MemorySize: 128
     Environment:
       Variables:
