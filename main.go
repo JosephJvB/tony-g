@@ -25,7 +25,7 @@ func handleLambdaEvent(year int) {
 
 	now := time.Now()
 	timestamp := now.Format(time.RFC3339)
-	if year < 2022 {
+	if year == 0 {
 		year = now.Year()
 	}
 

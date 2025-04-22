@@ -33,6 +33,7 @@ Resources:
       Policies:
         - SSMParameterWithSlashPrefixReadPolicy:
             # TODO: does prefix* work? Or will I need to add one policy per parameter?
+            # Seems to work!
             ParameterName: /Tony2Stack/*
       # Events:
       # TODO on cron, saturday morning
