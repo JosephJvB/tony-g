@@ -1,6 +1,6 @@
 package spotify
 
-const TonyPlaylistPrefix = "TONY'S TOP TRACKS #2 "
+const TonyPlaylistPrefix = "Now That's What I Call Melon Music: "
 const JvbSpotifyId = "xnmacgqaaa6a1xi7uy2k1fe7w"
 
 type SpotifyArtist struct {

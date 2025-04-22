@@ -88,4 +88,19 @@ Maybe I should keep my guy running!
 1. turn tony2 back online (delete web assets stack tho that's garbage)
 2. tony-gony needs a new prefix "2onys 2op 2racks 2024" ?
 
-- aso I should rename tony-gony to tony-g that's way better
+- also I should rename tony-gony to tony-g that's way better
+- then I can have Tony-g2 if I wanna redo the JS service
+
+I wanna split the service into two lambdas.
+Then I could have a generic api that can turn Apple Playlist into Spotify Playlist.
+But My current service handles checking for existing songs and updating an existing playlist. So maybe that's a separate thing entirely.
+So let's not yet.
+
+### todo:
+
+1. deploy go lambda to run on chron. can accept payload { "year": int }. Create now that's what I call melon music playlists
+2. continue tony-g2 to replace tony2 service scraping from youtube. Should I do this one? Or just resurrect old service? Nah let's keep pushing I reckon. that original service is ah, not good!
+
+- nah I'm gonna resurrect old tony... And focus on my promotion.
+
+3. make api gateway lambda that can turn apple playlist into spotify playlist.
