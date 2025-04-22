@@ -13,7 +13,13 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func HandleLambdaEvent(year int) {
+// if this lambda was regularly invoked
+// I would initialize AWS clients here
+// but it's not so I wont!
+// var ()
+// func init() {}
+
+func handleLambdaEvent(year int) {
 	paramClient := ssm.NewClient()
 	paramClient.LoadParameterValues()
 
@@ -60,7 +66,7 @@ func HandleLambdaEvent(year int) {
 
 	spc := spotify.NewClient(spotify.Secrets{
 		ClientId:     paramClient.SpotifyClientId.Value,
-		ClientSecret: paramClient.GoogleClientEmail.Value,
+		ClientSecret: paramClient.SpotifyClientSecret.Value,
 		RefreshToken: paramClient.SpotifyRefreshToken.Value,
 	})
 
@@ -140,5 +146,5 @@ func HandleLambdaEvent(year int) {
 }
 
 func main() {
-	lambda.Start(HandleLambdaEvent)
+	lambda.Start(handleLambdaEvent)
 }
