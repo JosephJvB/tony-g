@@ -35,10 +35,18 @@ Resources:
             # TODO: does prefix* work? Or will I need to add one policy per parameter?
             # Seems to work!
             ParameterName: /Tony2Stack/*
-      # Events:
-      # TODO on cron, saturday morning
-      # apple playlists are updated on Friday, so they say.
-      # cron(0 7? * SAT *)
+      Events:
+        WeeklyInvoko:
+          Type: ScheduleV2
+          Properties:
+            # also accepts '{ "year": int }' but defaults to current Year
+            Input: '{}'
+            # TODO: on cron, saturday morning
+            # apple playlists are updated on Friday, so they say.
+            # https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-scheduled-rule-pattern.html
+            # minutes, hours, day-of-month, month, day-of-week, year
+            ScheduleExpression: cron(0 7 ? * SAT *)
+
 Outputs:
   MainFunction:
     Description: it runs
