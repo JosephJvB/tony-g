@@ -1,4 +1,4 @@
-# Tony Gony
+# Tony G
 
 rebuild Tony with Go
 
@@ -100,9 +100,9 @@ So let's not yet.
 
 ### todo:
 
-1. deploy go lambda to run on chron. can accept payload { "year": int }. Create now that's what I call melon music playlists
-2. continue tony-g2 to replace tony2 service scraping from youtube. Should I do this one? Or just resurrect old service? Nah let's keep pushing I reckon. that original service is ah, not good!
-
-- nah I'm gonna resurrect old tony... And focus on my promotion.
-
-3. make api gateway lambda that can turn apple playlist into spotify playlist.
+- [x] deploy go lambda to run on chron. can accept payload { "year": int }. Create now that's what I call melon music playlists
+- [] continue tony-g2 to replace tony2 service scraping from youtube. Should I do this one? Or just resurrect old service? Nah let's keep pushing I reckon. that original service is ah, not good!
+  - do I keep using same google sheets data tho? Yeah I guess even tho I don't like it.
+  - I wish I had kept a similar sheet where all tracks get added in, but when I first did it I only added missing tracks.
+  - I do think tracking parsed videos is OK tho.
+- [] make api gateway lambda that can turn apple playlist into spotify playlist.
