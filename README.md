@@ -2,6 +2,8 @@
 
 rebuild Tony with Go
 
+`sam build && sam deploy --profile joe`
+
 Gonna end up deploying him to AWS as per. So I'll use this repo as ref https://github.com/JosephJvB/spotify-users-backend
 
 need:
