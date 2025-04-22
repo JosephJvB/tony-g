@@ -19,24 +19,32 @@ import (
 // var ()
 // func init() {}
 
-func handleLambdaEvent(year int) {
-	paramClient := ssm.NewClient()
-	paramClient.LoadParameterValues()
+type Evt struct {
+	Year int `json:"year"`
+}
 
+func handleLambdaEvent(evt Evt) {
 	now := time.Now()
 	timestamp := now.Format(time.RFC3339)
-	if year == 0 {
-		year = now.Year()
+	if evt.Year == 0 {
+		evt.Year = now.Year()
 	}
 
 	sc := scraping.NewClient()
-	scrapedTracks := sc.GetTracksForYear(year)
+	scrapedTracks := sc.GetTracksForYear(evt.Year)
 
 	fmt.Printf(
 		"scraped %d tracks apple music playlist:%d\n",
 		len(scrapedTracks),
-		year,
+		evt.Year,
 	)
+
+	if len(scrapedTracks) == 0 {
+		return
+	}
+
+	paramClient := ssm.NewClient()
+	paramClient.LoadParameterValues()
 
 	gs := googlesheets.NewClient(googlesheets.Secrets{
 		Email:      paramClient.GoogleClientEmail.Value,
@@ -102,7 +110,7 @@ func handleLambdaEvent(year int) {
 
 	fmt.Printf("\nfound %d/%d tracks\n", len(foundTracks), len(toLookup))
 
-	tonyPlaylistName := spotify.TonyPlaylistPrefix + strconv.Itoa(year)
+	tonyPlaylistName := spotify.TonyPlaylistPrefix + strconv.Itoa(evt.Year)
 	myPlaylists := spc.GetMyPlaylists()
 	// choosing this as my pattern for handling struct not found in list
 	// copying `value, ok := dict["key"] access`
@@ -114,7 +122,7 @@ func handleLambdaEvent(year int) {
 		}
 	}
 
-	fmt.Printf("spotify playlist for %d exists: %t\n", year, ok)
+	fmt.Printf("spotify playlist for %d exists: %t\n", evt.Year, ok)
 
 	// keyed by spotify track id
 	currentTrackMap := map[string]bool{}
@@ -127,7 +135,7 @@ func handleLambdaEvent(year int) {
 		}
 	}
 
-	fmt.Printf("%d tracks already in %d playlist\n", len(currentTrackMap), year)
+	fmt.Printf("%d tracks already in %d playlist\n", len(currentTrackMap), evt.Year)
 
 	toAdd := []string{}
 	for _, t := range foundTracks {
@@ -136,7 +144,7 @@ func handleLambdaEvent(year int) {
 		}
 	}
 
-	fmt.Printf("adding %d tracks to %d playlist\n", len(toAdd), year)
+	fmt.Printf("adding %d tracks to %d playlist\n", len(toAdd), evt.Year)
 
 	spc.AddPlaylistItems(tonyPlaylist.Id, toAdd)
 
