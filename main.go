@@ -9,22 +9,27 @@ import (
 	"tony-gony/internal/spotify"
 	"tony-gony/internal/ssm"
 	"tony-gony/internal/util"
+
+	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func main() {
+func HandleLambdaEvent(year int) {
 	paramClient := ssm.NewClient()
 	paramClient.LoadParameterValues()
 
-	timestamp := time.Now().Format(time.RFC3339)
-	thisYear := time.Now().Year()
+	now := time.Now()
+	timestamp := now.Format(time.RFC3339)
+	if year < 2022 {
+		year = now.Year()
+	}
 
 	sc := scraping.NewClient()
-	scrapedTracks := sc.GetTracksForYear(thisYear)
+	scrapedTracks := sc.GetTracksForYear(year)
 
 	fmt.Printf(
 		"scraped %d tracks apple music playlist:%d\n",
 		len(scrapedTracks),
-		thisYear,
+		year,
 	)
 
 	gs := googlesheets.NewClient(googlesheets.Secrets{
@@ -91,7 +96,7 @@ func main() {
 
 	fmt.Printf("\nfound %d/%d tracks\n", len(foundTracks), len(toLookup))
 
-	tonyPlaylistName := spotify.TonyPlaylistPrefix + strconv.Itoa(thisYear)
+	tonyPlaylistName := spotify.TonyPlaylistPrefix + strconv.Itoa(year)
 	myPlaylists := spc.GetMyPlaylists()
 	// choosing this as my pattern for handling struct not found in list
 	// copying `value, ok := dict["key"] access`
@@ -103,7 +108,7 @@ func main() {
 		}
 	}
 
-	fmt.Printf("spotify playlist for %d exists: %t\n", thisYear, ok)
+	fmt.Printf("spotify playlist for %d exists: %t\n", year, ok)
 
 	// keyed by spotify track id
 	currentTrackMap := map[string]bool{}
@@ -116,7 +121,7 @@ func main() {
 		}
 	}
 
-	fmt.Printf("%d tracks already in %d playlist\n", len(currentTrackMap), thisYear)
+	fmt.Printf("%d tracks already in %d playlist\n", len(currentTrackMap), year)
 
 	toAdd := []string{}
 	for _, t := range foundTracks {
@@ -125,11 +130,15 @@ func main() {
 		}
 	}
 
-	fmt.Printf("adding %d tracks to %d playlist\n", len(toAdd), thisYear)
+	fmt.Printf("adding %d tracks to %d playlist\n", len(toAdd), year)
 
 	spc.AddPlaylistItems(tonyPlaylist.Id, toAdd)
 
 	fmt.Printf("adding %d rows to scraped google sheet\n", len(nextRows))
 
 	gs.AddNextRows(nextRows)
+}
+
+func main() {
+	lambda.Start(HandleLambdaEvent)
 }

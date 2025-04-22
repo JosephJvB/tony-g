@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: 'Golang Spotty api'
+Description: 'Steal intellectual property from Tony Fantano'
 
 Parameters:
   DEBUG:
@@ -21,7 +21,7 @@ Globals:
         DEBUG: !Ref DEBUG
 
 Resources:
-  RunDaTing:
+  MainFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
@@ -31,9 +31,11 @@ Resources:
         - SSMParameterWithSlashPrefixReadPolicy:
             # TODO: does prefix* work? Or will I need to add one policy per parameter?
             ParameterName: /Tony2Stack/*
-      Events:
+      # Events:
       # TODO on cron, saturday morning
+      # apple playlists are updated on Friday, so they say.
+      # cron(0 7? * SAT *)
 Outputs:
-  RunDaTing:
+  MainFunction:
     Description: it runs
-    Value: !Ref RunDaTing
+    Value: !Ref MainFunction

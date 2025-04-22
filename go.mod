@@ -3,6 +3,7 @@ module tony-gony
 go 1.24.2
 
 require (
+	github.com/aws/aws-lambda-go v1.48.0
 	github.com/aws/aws-sdk-go-v2/config v1.29.14
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.58.2
 	github.com/gocolly/colly/v2 v2.2.0
