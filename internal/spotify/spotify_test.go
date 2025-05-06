@@ -2,6 +2,7 @@ package spotify
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"testing"
 	"tony-gony/internal/scraping"
@@ -306,6 +307,52 @@ func TestSpotify(t *testing.T) {
 		}
 
 		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	t.Run("Can find 2025 playlist", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		p := s.GetMyPlaylists()
+
+		if len(p) == 0 {
+			t.Error("Failed to load tony playlists")
+		}
+
+		fmt.Printf("Found %d playlists\n", len(p))
+
+		playlistName := TonyPlaylistPrefix + "2025"
+		playlist, ok := SpotifyPlaylist{}, false
+		for _, p := range p {
+			if p.Name == playlistName {
+				playlist = p
+				ok = true
+			}
+		}
+
+		if !ok {
+			t.Error("Failed to find playlist: 2025")
+		}
+
+		b, err := json.MarshalIndent(playlist, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/2025-playlist.json", b, 0666)
 		if err != nil {
 			panic(err)
 		}

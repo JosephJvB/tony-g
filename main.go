@@ -111,7 +111,11 @@ func handleLambdaEvent(evt Evt) {
 	fmt.Printf("\nfound %d/%d tracks\n", len(foundTracks), len(toLookup))
 
 	tonyPlaylistName := spotify.TonyPlaylistPrefix + strconv.Itoa(evt.Year)
+	fmt.Printf("finding playlist %s\n", tonyPlaylistName)
+
 	myPlaylists := spc.GetMyPlaylists()
+	fmt.Printf("loaded %d playlists\n", len(myPlaylists))
+
 	// choosing this as my pattern for handling struct not found in list
 	// copying `value, ok := dict["key"] access`
 	tonyPlaylist, ok := spotify.SpotifyPlaylist{}, false
