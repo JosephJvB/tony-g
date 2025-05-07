@@ -4,7 +4,7 @@ import (
 	"context"
 	"strconv"
 	"strings"
-	util "tony-gony/internal/util"
+	"tony-gony/internal/util"
 
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/option"
