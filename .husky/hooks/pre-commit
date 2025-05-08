@@ -1,0 +1,3 @@
+#!/bin/sh
+
+go run -mod=mod github.com/rakyll/gotest@latest *** -v
