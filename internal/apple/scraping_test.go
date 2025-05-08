@@ -1,14 +1,13 @@
-package scraping
+package apple
 
 import (
 	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
-	util "tony-gony/internal/util"
 )
 
-func TestScraping(t *testing.T) {
+func TestAppleScraping(t *testing.T) {
 	t.Run("Can get embedded apple music playlist url for 2025", func(t *testing.T) {
 		t.Skip("making live api call")
 		playlistUrl := scrapeApplePlaylistUrlFromTony(2025)
@@ -38,30 +37,6 @@ func TestScraping(t *testing.T) {
 
 		if len(trackList) == 0 {
 			t.Errorf("Failed to get tracklist from url")
-		}
-	})
-
-	t.Run("can update id in loop", func(t *testing.T) {
-		tracks := []ScrapedTrack{
-			{
-				Id:     "",
-				Title:  "777",
-				Artist: "ilu hotties",
-				Album:  "idk yet",
-			},
-		}
-
-		for i := range tracks {
-			tracks[i].Id = util.MakeTrackId(util.IdParts{
-				Title:  tracks[i].Title,
-				Artist: tracks[i].Artist,
-				Album:  tracks[i].Album,
-				Year:   "2025",
-			})
-		}
-
-		if tracks[0].Id == "" {
-			t.Errorf("oops it doesnt work")
 		}
 	})
 }

@@ -88,9 +88,9 @@ eep!
 Maybe I should keep my guy running!
 
 1. turn tony2 back online (delete web assets stack tho that's garbage)
-2. tony-gony needs a new prefix "2onys 2op 2racks 2024" ?
+2. tony-g needs a new prefix "2onys 2op 2racks 2024" ?
 
-- also I should rename tony-gony to tony-g that's way better
+- also I should rename tony-g to tony-g that's way better
 - then I can have Tony-g2 if I wanna redo the JS service
 
 I wanna split the service into two lambdas.

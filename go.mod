@@ -1,4 +1,4 @@
-module tony-gony
+module tony-g
 
 go 1.24.2
 

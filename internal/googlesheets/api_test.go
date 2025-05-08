@@ -43,16 +43,13 @@ func TestGoogleSheets(t *testing.T) {
 			PrivateKey: fixedKey,
 		})
 
-		gs.LoadScrapedTracks()
+		tracks := gs.GetAppleTracks()
 
-		if len(gs.scrapedTracks) == 0 {
+		if len(tracks) == 0 {
 			t.Errorf("Expected parsed videos to be loaded")
 		}
-		if len(gs.ScrapedTracksMap) == 0 {
-			t.Errorf("Expected parsed videos map to be loaded")
-		}
 
-		b, err := json.MarshalIndent(gs.scrapedTracks, "", "	")
+		b, err := json.MarshalIndent(tracks, "", "	")
 		if err != nil {
 			panic(err)
 		}
@@ -83,9 +80,8 @@ func TestGoogleSheets(t *testing.T) {
 			PrivateKey: fixedKey,
 		})
 
-		toAdd := []ScrapedTrackRow{
+		toAdd := []AppleTrackRow{
 			{
-				Id:      "",
 				Title:   "song 9",
 				Artist:  "artist 9",
 				Album:   "album 9",
@@ -94,7 +90,6 @@ func TestGoogleSheets(t *testing.T) {
 				AddedAt: "2024-04-16T00:00:00.000Z",
 			},
 			{
-				Id:      "",
 				Title:   "song 2",
 				Artist:  "artist 2",
 				Album:   "album 2",
@@ -104,6 +99,6 @@ func TestGoogleSheets(t *testing.T) {
 			},
 		}
 
-		gs.AddNextRows(toAdd)
+		gs.AddAppleTracks(toAdd)
 	})
 }

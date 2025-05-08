@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	"tony-gony/internal/scraping"
+	"tony-g/internal/apple"
 
 	"github.com/joho/godotenv"
 )
@@ -185,7 +185,7 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(scraping.ScrapedTrack{
+		found := s.FindTrack(apple.ScrapedTrack{
 			Title:  "My Golden Years",
 			Artist: "The Lemon Twigs",
 			Year:   2025,
@@ -219,7 +219,7 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(scraping.ScrapedTrack{
+		found := s.FindTrack(apple.ScrapedTrack{
 			Title:  "Somethin' (feat. Sexyy Red)",
 			Artist: "Nardo Wick",
 			Year:   2025,
@@ -253,7 +253,7 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(scraping.ScrapedTrack{
+		found := s.FindTrack(apple.ScrapedTrack{
 			// i think i gotta trim "(feat. ...)" and "[feat. ...]"
 			Title: "FUNKFEST (feat. TJOnline)", // fails
 			// Title:  "FUNKFEST)", // works
@@ -289,7 +289,7 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(scraping.ScrapedTrack{
+		found := s.FindTrack(apple.ScrapedTrack{
 			// i think i gotta trim "(feat. ...)" and "[feat. ...]"
 			Title: "Times Is Rough (feat. Heem B$F & Rick Hyde)", // fails
 			// Title:  "Times Is Rough", // works

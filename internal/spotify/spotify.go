@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"tony-gony/internal/scraping"
+	"tony-g/internal/apple"
 )
 
 const ApiBaseUrl = "https://api.spotify.com/v1"
@@ -111,7 +111,7 @@ func (s *SpotifyClient) GetMyPlaylists() []SpotifyPlaylist {
 	return playlists
 }
 
-func getPaginatedItems[T any](startUrl string, token string) []T {
+func getPaginatedItems[T SpotifyItem](startUrl string, token string) []T {
 	apiUrl := startUrl
 
 	items := []T{}
@@ -156,7 +156,7 @@ func (s *SpotifyClient) GetPlaylistItems(playlistId string) []SpotifyPlaylistIte
 	return items
 }
 
-func (s *SpotifyClient) FindTrack(t scraping.ScrapedTrack) []SpotifyTrack {
+func (s *SpotifyClient) FindTrack(t apple.ScrapedTrack) []SpotifyTrack {
 	if s.accessToken == "" {
 		s.loadAccessToken()
 	}

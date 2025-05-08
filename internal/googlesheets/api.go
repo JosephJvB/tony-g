@@ -2,9 +2,6 @@ package googlesheets
 
 import (
 	"context"
-	"strconv"
-	"strings"
-	"tony-gony/internal/util"
 
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/option"
@@ -19,26 +16,25 @@ type SheetConfig struct {
 	AllRowRange string
 }
 
-var ScrapedTracksSheet = SheetConfig{
-	Name:        "Scraped Tracks",
+var AppleTrackSheet = SheetConfig{
+	Name:        "Apple Tracks",
 	Id:          279196507,
 	AllRowRange: "A2:F",
 }
 
-type ScrapedTrackRow struct {
-	Id      string
-	Title   string
-	Artist  string
-	Album   string
-	Year    int
-	Found   bool
-	AddedAt string
+var YoutubeVideosSheet = SheetConfig{
+	Name:        "Youtube Videos",
+	Id:          1649352476,
+	AllRowRange: "A2:F",
+}
+var YoutubeTrackSheet = SheetConfig{
+	Name:        "Youtube Tracks",
+	Id:          1330220669,
+	AllRowRange: "A2:F",
 }
 
 type GoogleSheetsClient struct {
-	sheetsService    *sheets.Service
-	scrapedTracks    []ScrapedTrackRow
-	ScrapedTracksMap map[string]bool
+	sheetsService *sheets.Service
 }
 
 type Secrets struct {
@@ -65,14 +61,12 @@ func NewClient(secrets Secrets) GoogleSheetsClient {
 	}
 
 	return GoogleSheetsClient{
-		sheetsService:    sheetsService,
-		scrapedTracks:    []ScrapedTrackRow{},
-		ScrapedTracksMap: map[string]bool{},
+		sheetsService: sheetsService,
 	}
 }
 
-func (gs *GoogleSheetsClient) LoadScrapedTracks() {
-	sheetRange := ScrapedTracksSheet.Name + "!" + ScrapedTracksSheet.AllRowRange
+func (gs *GoogleSheetsClient) GetAppleTracks() []AppleTrackRow {
+	sheetRange := AppleTrackSheet.Name + "!" + AppleTrackSheet.AllRowRange
 
 	resp, err := gs.sheetsService.Spreadsheets.Values.
 		Get(SpreadsheetId, sheetRange).
@@ -81,46 +75,21 @@ func (gs *GoogleSheetsClient) LoadScrapedTracks() {
 		panic(err)
 	}
 
+	tracks := []AppleTrackRow{}
 	for _, row := range resp.Values {
-		yearStr := row[3].(string)
-		year, err := strconv.Atoi(yearStr)
-		if err != nil {
-			year = -1
-		}
+		r := RowToAppleTrack(row)
 
-		r := ScrapedTrackRow{
-			Id:      "",
-			Title:   row[0].(string),
-			Artist:  row[1].(string),
-			Album:   row[2].(string),
-			Year:    year,
-			Found:   strings.ToUpper(row[4].(string)) == "TRUE",
-			AddedAt: row[5].(string),
-		}
-
-		r.Id = util.MakeTrackId(util.IdParts{
-			Title:  r.Title,
-			Artist: r.Artist,
-			Album:  r.Album,
-			Year:   yearStr,
-		})
-
-		gs.scrapedTracks = append(gs.scrapedTracks, r)
-		gs.ScrapedTracksMap[r.Id] = true
+		tracks = append(tracks, r)
 	}
+
+	return tracks
 }
 
-func (gs *GoogleSheetsClient) AddNextRows(nextRows []ScrapedTrackRow) {
+func (gs *GoogleSheetsClient) AddAppleTracks(nextRows []AppleTrackRow) {
 	// sheets.ValueRange.Values needs interfaces
 	rows := make([][]interface{}, len(nextRows))
 	for _, t := range nextRows {
-		r := make([]interface{}, 6)
-		r[0] = t.Title
-		r[1] = t.Artist
-		r[2] = t.Album
-		r[3] = t.Year
-		r[4] = t.Found
-		r[5] = t.AddedAt
+		r := AppleTrackToRow(t)
 
 		rows = append(rows, r)
 	}
@@ -131,7 +100,7 @@ func (gs *GoogleSheetsClient) AddNextRows(nextRows []ScrapedTrackRow) {
 		Values:         rows,
 	}
 	// is this range gonna append rows the way I want?
-	rowRange := ScrapedTracksSheet.Name + "!" + ScrapedTracksSheet.AllRowRange
+	rowRange := AppleTrackSheet.Name + "!" + AppleTrackSheet.AllRowRange
 	req := gs.sheetsService.Spreadsheets.Values.Append(SpreadsheetId, rowRange, &valueRange)
 	// is this the only way to add these params?
 	req.ValueInputOption("RAW")

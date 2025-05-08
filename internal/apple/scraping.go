@@ -1,13 +1,42 @@
-package scraping
+package apple
 
 import (
 	"encoding/json"
 	"strconv"
 	"strings"
-	util "tony-gony/internal/util"
 
 	"github.com/gocolly/colly/v2"
 )
+
+type AppleTrackListItem struct {
+	Title         string `json:"title"`
+	ArtistName    string `json:"artistName"`
+	Duration      int    `json:"duration"`
+	TertiaryLinks []struct {
+		Title string `json:"title"`
+		Segue struct {
+			Destination struct {
+				ContentDescriptor struct {
+					Kind string `json:"kind"`
+				} `json:"contentDescriptor"`
+			} `json:"destination"`
+		} `json:"segue"`
+	} `json:"tertiaryLinks"`
+}
+type AppleServerData struct {
+	Intent struct {
+		ContentDescriptor struct {
+			Kind string `json:"kind"`
+		} `json:"contentDescriptor"`
+	} `json:"intent"`
+	Data struct {
+		Sections []struct {
+			Id       string               `json:"id"`
+			ItemKind string               `json:"itemKind"`
+			Items    []AppleTrackListItem `json:"items"`
+		} `json:"sections"`
+	} `json:"data"`
+}
 
 // don't really need a client
 // but I guess consistency with other internal API's?
@@ -25,15 +54,7 @@ func (sc *ScrapingClient) GetTracksForYear(year int) []ScrapedTrack {
 
 	trackList := scrapeTrackListFromApple(playlistUrl)
 
-	yearStr := strconv.Itoa(year)
-
-	for i, t := range trackList {
-		trackList[i].Id = util.MakeTrackId(util.IdParts{
-			Title:  t.Title,
-			Artist: t.Artist,
-			Album:  t.Album,
-			Year:   yearStr,
-		})
+	for i := range trackList {
 		trackList[i].Year = year
 	}
 

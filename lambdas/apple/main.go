@@ -1,17 +1,20 @@
-package main
+package scrapeapple
 
 import (
 	"fmt"
 	"strconv"
 	"time"
-	"tony-gony/internal/googlesheets"
-	"tony-gony/internal/scraping"
-	"tony-gony/internal/spotify"
-	"tony-gony/internal/ssm"
-	"tony-gony/internal/util"
+	"tony-g/internal/apple"
+	"tony-g/internal/googlesheets"
+	"tony-g/internal/spotify"
+	"tony-g/internal/ssm"
 
 	"github.com/aws/aws-lambda-go/lambda"
 )
+
+// AppleTrackListItem
+// -> ScrapedTrack - can I skip this?
+// -> AppleTrackRow
 
 // if this lambda was regularly invoked
 // I would initialize AWS clients here
@@ -30,8 +33,8 @@ func handleLambdaEvent(evt Evt) {
 		evt.Year = now.Year()
 	}
 
-	sc := scraping.NewClient()
-	scrapedTracks := sc.GetTracksForYear(evt.Year)
+	ac := apple.NewClient()
+	scrapedTracks := ac.GetTracksForYear(evt.Year)
 
 	fmt.Printf(
 		"scraped %d tracks apple music playlist:%d\n",
@@ -50,18 +53,24 @@ func handleLambdaEvent(evt Evt) {
 		Email:      paramClient.GoogleClientEmail.Value,
 		PrivateKey: paramClient.GooglePrivateKey.Value,
 	})
-	gs.LoadScrapedTracks()
+	prevTracks := gs.GetAppleTracks()
 
 	fmt.Printf(
 		"loaded %d tracks from google sheets\n",
-		len(gs.ScrapedTracksMap),
+		len(prevTracks),
 	)
 
+	m := map[string]bool{}
+	for _, t := range prevTracks {
+		m[t.GetAppleTrackId()] = true
+	}
+
 	// don't lookup tracks if they're already in Google Sheets
-	toLookup := []scraping.ScrapedTrack{}
+	toLookup := []apple.ScrapedTrack{}
 	for _, t := range scrapedTracks {
-		// keyed by custom id. See `util.go`
-		if !gs.ScrapedTracksMap[t.Id] {
+		i := t.GetAppleTrackId()
+
+		if !m[i] {
 			toLookup = append(toLookup, t)
 		}
 	}
@@ -78,7 +87,7 @@ func handleLambdaEvent(evt Evt) {
 		RefreshToken: paramClient.SpotifyRefreshToken.Value,
 	})
 
-	nextRows := []googlesheets.ScrapedTrackRow{}
+	nextRows := []googlesheets.AppleTrackRow{}
 	foundTracks := []spotify.SpotifyTrack{}
 	for i, t := range toLookup {
 		fmt.Printf("finding track %d/%d\r", i+1, len(toLookup))
@@ -86,7 +95,7 @@ func handleLambdaEvent(evt Evt) {
 
 		// on first failure - try normalize track title
 		if len(results) == 0 {
-			withoutFeatureStr := util.RemoveFeatureString(t.Title)
+			withoutFeatureStr := spotify.CleanSongTitle(t.Title)
 			if withoutFeatureStr != t.Title {
 				t2 := t
 				t2.Title = withoutFeatureStr
@@ -98,7 +107,7 @@ func handleLambdaEvent(evt Evt) {
 			foundTracks = append(foundTracks, results[0])
 		}
 
-		nextRows = append(nextRows, googlesheets.ScrapedTrackRow{
+		nextRows = append(nextRows, googlesheets.AppleTrackRow{
 			Title:   t.Title,
 			Artist:  t.Artist,
 			Album:   t.Album,
@@ -154,7 +163,7 @@ func handleLambdaEvent(evt Evt) {
 
 	fmt.Printf("adding %d rows to scraped google sheet\n", len(nextRows))
 
-	gs.AddNextRows(nextRows)
+	gs.AddAppleTracks(nextRows)
 }
 
 func main() {
