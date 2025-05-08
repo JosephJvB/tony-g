@@ -106,3 +106,8 @@ So let's not yet.
   - I wish I had kept a similar sheet where all tracks get added in, but when I first did it I only added missing tracks.
   - I do think tracking parsed videos is OK tho.
 - [] make api gateway lambda that can turn apple playlist into spotify playlist.
+
+I wanna re-parse all youtube descriptions
+so I can include all the tracks that were found as well as the missing ones
+However, old tony-2 had loads of those "replacers" to fix typos
+Is it LLM time?

@@ -13,8 +13,6 @@ type AppleIdParts struct {
 }
 
 func MakeAppleId(parts AppleIdParts) string {
-	id := ""
-
 	idParts := []string{
 		parts.Title,
 		parts.Artist,
@@ -22,7 +20,13 @@ func MakeAppleId(parts AppleIdParts) string {
 		strconv.Itoa(parts.Year),
 	}
 
-	for _, p := range idParts {
+	return makeId(idParts)
+}
+
+func makeId(parts []string) string {
+	id := ""
+
+	for _, p := range parts {
 		if id != "" {
 			id += "__"
 		}
