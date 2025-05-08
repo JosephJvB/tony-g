@@ -1,14 +1,14 @@
-package apple
+package googlesheets
 
 import (
 	"testing"
 )
 
-func TestAppleModels(t *testing.T) {
-	t.Run("apple scraped track makes expected id", func(t *testing.T) {
+func TestYoutubeModels(t *testing.T) {
+	t.Run("apple track row makes expected id", func(t *testing.T) {
 		expectedId := "sea of trees__king gizz__12 bb__2012"
 
-		scrapedTrack := ScrapedTrack{
+		scrapedTrack := AppleTrackRow{
 			Title:  "Sea of Trees",
 			Artist: "King Gizz",
 			Album:  "12 BB",
