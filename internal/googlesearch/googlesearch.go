@@ -35,7 +35,7 @@ func Search(q string) {
 	log.Print(b.String())
 	fmt.Println("success") // todo scrape the result
 
-	err = os.WriteFile("../../data/googlesearch.json", []byte(b.String()), 0666)
+	err = os.WriteFile("../../data/googlesearch.html", []byte(b.String()), 0666)
 	if err != nil {
 		panic(err)
 	}
