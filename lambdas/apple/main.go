@@ -125,6 +125,11 @@ func handleLambdaEvent(evt Evt) {
 	myPlaylists := spc.GetMyPlaylists()
 	fmt.Printf("loaded %d playlists\n", len(myPlaylists))
 
+	// issue: same as previous service, sometimes this code is not finding playlist by name
+	// 1. did I not structure the name correctly?
+	// 2. more likely: I didn't load the right playlist from Spotify
+	// if problem persists, I'll make a new Sheet storing year -> playlistId mapping
+	//
 	// choosing this as my pattern for handling struct not found in list
 	// copying `value, ok := dict["key"] access`
 	tonyPlaylist, ok := spotify.SpotifyPlaylist{}, false
