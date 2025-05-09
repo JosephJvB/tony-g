@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"google.golang.org/genai"
 )
@@ -56,7 +57,7 @@ func (c *GeminiClient) ParseYoutubeDescription(description string) {
 }
 
 func (c *GeminiClient) FindSpotifyUrls(tracks []ParsedTrack) {
-	input := "Perform a web search to find following tracks in Songlink and return the Spotify URL from that Songlink page.\n"
+	input := "Perform a google search to find valid Spotify Track URLs for following tracks.\n"
 
 	for i, t := range tracks {
 		if i != 0 {
@@ -80,4 +81,14 @@ func (c *GeminiClient) FindSpotifyUrls(tracks []ParsedTrack) {
 	}
 
 	fmt.Println(result.Text())
+
+	d, err := result.MarshalJSON()
+	if err != nil {
+		panic(err)
+	}
+
+	err = os.WriteFile("../../data/gemini-resp.json", d, 0666)
+	if err != nil {
+		panic(err)
+	}
 }
