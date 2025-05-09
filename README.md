@@ -111,3 +111,21 @@ I wanna re-parse all youtube descriptions
 so I can include all the tracks that were found as well as the missing ones
 However, old tony-2 had loads of those "replacers" to fix typos
 Is it LLM time?
+
+Google gemini is pretty good at getting the Best Tracks from description
+But it's really bad at finding Spotify URLs
+
+- maybe I can use Google Search for that?
+- Or as long as Gemini can fix the typos I can continue to use Spotify Search
+
+It seems to handle typos
+Can it handle two songs with slash? it can! it can VERY well
+
+so, the steps:
+
+1. Gemini creates a BestTrackList from youtube description
+2. Try find all those songs in Spotify
+3. If I can't find a song I have the following options
+   1. google search api for spotify link (should be more forgiving than spotify search api): yeah this works well
+   2. Gemini to do a google search per missing song (seems to work for individual songs? Or it did on chatgpt once, but not since)
+   3. ~~scrape google search results~~ doesnt work

@@ -357,4 +357,37 @@ func TestSpotify(t *testing.T) {
 			panic(err)
 		}
 	})
+
+	t.Run("can find Blood of the Fang with typo", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(apple.ScrapedTrack{
+			Title:  "Blood on the Fang", // fails
+			Artist: "clipping.",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: 'Blood on the Fang'")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
 }

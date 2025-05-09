@@ -2,9 +2,7 @@ package gemini
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"os"
 
 	"google.golang.org/genai"
 )
@@ -36,8 +34,45 @@ func NewClient(apiKey string) GeminiClient {
 	}
 }
 
-func (c *GeminiClient) ParseYoutubeDescription(description string) {
-	input := "Return the Best Tracks mentioned in the following text. Each track item should have properties title and artist. Please return the list as valid JSON.\n" + description
+func (c *GeminiClient) ParseYoutubeDescription(description string) *genai.GenerateContentResponse {
+	input := "Return the Best Tracks mentioned in the following text snippet:\n" + description
+
+	result, err := c.client.Models.GenerateContent(
+		c.ctx,
+		"gemini-2.0-flash",
+		genai.Text(input),
+		&genai.GenerateContentConfig{
+			// Tools: []*genai.Tool{
+			// 	{GoogleSearch: &genai.GoogleSearch{}},
+			// },
+			// can return JSON but not with a google search!
+			ResponseMIMEType: "application/json",
+			ResponseSchema: &genai.Schema{
+				Type: genai.TypeArray,
+				Items: &genai.Schema{
+
+					Type: genai.TypeObject,
+					Properties: map[string]*genai.Schema{
+						"title":  {Type: genai.TypeString},
+						"artist": {Type: genai.TypeString},
+					},
+				},
+			},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return result
+}
+
+// Try to fix any typos that come from Youtube Video Description Text Snippet
+//
+// Deprecated: doesn't work
+// using Google Search API to find correct properties
+func (c *GeminiClient) ValidateSongProperties(songString string) *genai.GenerateContentResponse {
+	input := "Perform a web search for the following song and return the correct song title and artist name in case the input is spelled incorrectly:\nSong:\n" + songString
 
 	result, err := c.client.Models.GenerateContent(
 		c.ctx,
@@ -53,11 +88,15 @@ func (c *GeminiClient) ParseYoutubeDescription(description string) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(result.Text())
+	return result
 }
 
-func (c *GeminiClient) FindSpotifyUrls(tracks []ParsedTrack) {
-	input := "Perform a google search to find valid Spotify Track URLs for following tracks.\n"
+// Try find Spotify URLs for tracks from Youtube Video Description Text Snippet
+//
+// Deprecated: doesn't work
+// using Google Search API to find Spotify URL
+func (c *GeminiClient) FindSpotifyUrls(tracks []ParsedTrack) *genai.GenerateContentResponse {
+	input := "Perform a google search to find valid Spotify Track URLs for following tracks.\nTracks:\n"
 
 	for i, t := range tracks {
 		if i != 0 {
@@ -80,15 +119,5 @@ func (c *GeminiClient) FindSpotifyUrls(tracks []ParsedTrack) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(result.Text())
-
-	d, err := result.MarshalJSON()
-	if err != nil {
-		panic(err)
-	}
-
-	err = os.WriteFile("../../data/gemini-resp.json", d, 0666)
-	if err != nil {
-		panic(err)
-	}
+	return result
 }

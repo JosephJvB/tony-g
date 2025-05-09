@@ -1,6 +1,7 @@
 package gemini
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -8,6 +9,9 @@ import (
 )
 
 func TestGemini(t *testing.T) {
+	// parses description well
+	// not good for finding spotify urls
+	// or fixing typos
 	t.Run("Can parse test youtube description 2019 Weekly Track Roundup: 10/6", func(t *testing.T) {
 		t.Skip("Skip calling real Gemini API")
 
@@ -22,9 +26,54 @@ func TestGemini(t *testing.T) {
 
 		client := NewClient(apiKey)
 
-		client.ParseYoutubeDescription(description)
+		result := client.ParseYoutubeDescription(description)
+
+		fmt.Println(result.Text())
+
+		d, err := result.MarshalJSON()
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
+		if err != nil {
+			panic(err)
+		}
 	})
 
+	// issue is that Spotify will not return the track with these properties
+	// maybe I should do this with a programmatic google search
+	// this does work though...
+	t.Run("Find valid track name and artist with typo", func(t *testing.T) {
+		t.Skip("Skip calling real Gemini API")
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			t.Errorf("Error loading .env file")
+		}
+
+		input := "Blood on the Fang - clipping."
+
+		apiKey := os.Getenv("GEMINI_API_KEY")
+
+		client := NewClient(apiKey)
+
+		result := client.ValidateSongProperties(input)
+
+		fmt.Println(result.Text())
+
+		d, err := result.MarshalJSON()
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/gemini-validatesong-resp.json", d, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	// doesn't work :/
 	t.Run("Can find valid spotify id for clipping even with spelling error", func(t *testing.T) {
 		t.Skip("Skip calling real Gemini API")
 
@@ -49,5 +98,35 @@ func TestGemini(t *testing.T) {
 		client := NewClient(apiKey)
 
 		client.FindSpotifyUrls(tracks)
+	})
+
+	// ooh now this works v nicely
+	t.Run("Can handle case where description has two tracks (limerence/ankles)", func(t *testing.T) {
+		// t.Skip("Skip calling real Gemini API")
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			t.Errorf("Error loading .env file")
+		}
+
+		description := "2025 FAV TRACKS PLAYLIST: https://music.apple.com/us/playlist/my-fav-singles-of-2025/pl.u-ayeZTygbKDy\n\nTND Patreon: https://www.patreon.com/theneedledrop\n\nTurntable Lab link: http://turntablelab.com/theneedledrop\n\nAUSTEN SHOUTOUT\nventuring - Dead forever (\u0026 other singles)\nhttps://www.youtube.com/watch?v=DV3yteStUk0\u0026list=OLAK5uy_k-xM5zQh-RNWGoFK2K6FLqTSfACQI3_mc\u0026index=1\n\n\n!!!BEST TRACKS THIS WEEK!!!\n\nLucy Dacus - Ankles: https://www.youtube.com/watch?v=pcW_-uxy6dQ\u0026pp=ygUfTHVjeSBEYWN1cyAtIEFua2xlcyAvIExpbWVyZW5jZQ%3D%3D\nLimerence: https://www.youtube.com/watch?v=re3mFdbzJQ8\u0026pp=ygUfTHVjeSBEYWN1cyAtIEFua2xlcyAvIExpbWVyZW5jZQ%3D%3D\n\nGates to Hell - Next to Bleed\nhttps://www.youtube.com/watch?v=kTGHyGHgwJ0\u0026pp=ygUdR2F0ZXMgdG8gSGVsbCAtIE5leHQgdG8gQmxlZWQ%3D\n\nHorsegirl - Switch Over\nhttps://www.youtube.com/watch?v=mC1v7Y7bIKs\u0026pp=ygUXSG9yc2VnaXJsIC0gU3dpdGNoIE92ZXI%3D\n\nSaya Gray - SHELL ( OF A MAN )\nhttps://www.youtube.com/watch?v=KYM1BbMaoco\u0026pp=ygUeU2F5YSBHcmF5IC0gU0hFTEwgKCBPRiBBIE1BTiAp\n\nPerfume Genius - It's a Mirror\nhttps://www.youtube.com/watch?v=hx2_NGaDPrk\u0026pp=ygUeUGVyZnVtZSBHZW5pdXMgLSBJdCdzIGEgTWlycm9y\n\nT-Pain, Girl Talk, Yaeji - Believe in Ya\nhttps://www.youtube.com/watch?v=n_Usx_hhtiQ\u0026pp=ygUoVC1QYWluLCBHaXJsIFRhbGssIFlhZWppIC0gQmVsaWV2ZSBpbiBZYQ%3D%3D\n\nBaths - Eden\nhttps://www.youtube.com/watch?v=3N6EI_oHL1I\u0026pp=ygUMQmF0aHMgLSBFZGVu\n\n\n...meh...\n\nJohn Glacier - Ocean Steppin' ft. Sampha\nhttps://www.youtube.com/watch?v=g-r3wAdSWSE\u0026pp=ygUoSm9obiBHbGFjaWVyIC0gT2NlYW4gU3RlcHBpbicgZnQuIFNhbXBoYQ%3D%3D\n\nTim Hecker - Sunset Key Melt\nhttps://www.youtube.com/watch?v=26jeWB9Aw8c\u0026pp=ygUcVGltIEhlY2tlciAtIFN1bnNldCBLZXkgTWVsdA%3D%3D\n\nImperial Triumphant - Lexington Delirium ft. Tomas Haake\nhttps://www.youtube.com/watch?v=v9cDvwwbj6A\u0026pp=ygU4SW1wZXJpYWwgVHJpdW1waGFudCAtIExleGluZ3RvbiBEZWxpcml1bSBmdC4gVG9tYXMgSGFha2U%3D\n\nLogic - French Dispatch\nhttps://www.youtube.com/watch?v=Elj44V1HiVk\u0026pp=ygUXTG9naWMgLSBGcmVuY2ggRGlzcGF0Y2g%3D\n\nOklou - take me by the hand ft. Bladee\nhttps://www.youtube.com/watch?v=jdU16tnrt14\u0026pp=ygUmT2tsb3UgLSB0YWtlIG1lIGJ5IHRoZSBoYW5kIGZ0LiBCbGFkZWU%3D\n\nJungle - Keep Me Satisfied\nhttps://www.youtube.com/watch?v=fwq5sT-zLLk\u0026pp=ygUaSnVuZ2xlIC0gS2VlcCBNZSBTYXRpc2ZpZWQ%3D\n\nSharon Van Etten \u0026 The Attachment Theory - Trouble\nhttps://www.youtube.com/watch?v=hu3aQKiq-hk\u0026pp=ygUyU2hhcm9uIFZhbiBFdHRlbiAmIFRoZSBBdHRhY2htZW50IFRoZW9yeSAtIFRyb3VibGU%3D\n\n\n!!!WORST TRACKS THIS WEEK!!!\n\nImagine Dragons - Dare U ft. NLE Choppa\nhttps://www.youtube.com/watch?v=NObExZCktuM\u0026pp=ygUnSW1hZ2luZSBEcmFnb25zIC0gRGFyZSBVIGZ0LiBOTEUgQ2hvcHBh\n\nSpin Doctors - Still a Gorilla\nhttps://www.youtube.com/watch?v=vULjnd8YUMw\u0026pp=ygUiVGhlIFNwaW4gRG9jdG9ycyAtIFN0aWxsIGEgR29yaWxsYQ%3D%3D\n\nCentral Cee - GBP ft. 21 Savage\nhttps://www.youtube.com/watch?v=_Cu9Df_9Zvg\u0026pp=ygUfQ2VudHJhbCBDZWUgLSBHQlAgZnQuIDIxIFNhdmFnZQ%3D%3D\n\n===================================\nSubscribe: http://bit.ly/1pBqGCN\n\nPatreon: https://www.patreon.com/theneedledrop\n\nOfficial site: http://theneedledrop.com\n\nTwitter: http://twitter.com/theneedledrop\n\nInstagram: https://www.instagram.com/afantano\n\nTikTok: https://www.tiktok.com/@theneedletok\n\nTND Twitch: https://www.twitch.tv/theneedledrop\n===================================\n\nY'all know this is just my opinion, right?"
+
+		apiKey := os.Getenv("GEMINI_API_KEY")
+
+		client := NewClient(apiKey)
+
+		result := client.ParseYoutubeDescription(description)
+
+		fmt.Println(result.Text())
+
+		d, err := result.MarshalJSON()
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
+		if err != nil {
+			panic(err)
+		}
 	})
 }
