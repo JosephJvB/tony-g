@@ -129,3 +129,5 @@ so, the steps:
    1. google search api for spotify link (should be more forgiving than spotify search api): yeah this works well
    2. Gemini to do a google search per missing song (seems to work for individual songs? Or it did on chatgpt once, but not since)
    3. ~~scrape google search results~~ doesnt work
+
+I dont think husky precommit is working on this machine :(
