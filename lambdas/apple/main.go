@@ -35,6 +35,9 @@ func handleLambdaEvent(evt Evt) {
 
 	ac := apple.NewClient()
 	scrapedTracks := ac.GetTracksForYear(evt.Year)
+	if len(scrapedTracks) == 0 {
+		return
+	}
 
 	fmt.Printf(
 		"scraped %d tracks apple music playlist:%d\n",
@@ -76,7 +79,6 @@ func handleLambdaEvent(evt Evt) {
 	}
 
 	fmt.Printf("you gotta find %d tracks\n", len(toLookup))
-
 	if len(toLookup) == 0 {
 		return
 	}
@@ -101,18 +103,18 @@ func handleLambdaEvent(evt Evt) {
 		}
 
 		nextRows = append(nextRows, googlesheets.AppleTrackRow{
-			Title:   t.Title,
-			Artist:  t.Artist,
-			Album:   t.Album,
-			Year:    t.Year,
-			Found:   len(results) > 0,
-			AddedAt: timestamp,
+			Title:      t.Title,
+			Artist:     t.Artist,
+			Album:      t.Album,
+			SpotifyUrl: results[0].Href,
+			Year:       t.Year,
+			AddedAt:    timestamp,
 		})
 	}
 
 	fmt.Printf("\nfound %d/%d tracks\n", len(foundTracks), len(toLookup))
 
-	tonyPlaylistName := spotify.TonyPlaylistPrefix + strconv.Itoa(evt.Year)
+	tonyPlaylistName := spotify.ApplePlaylistPrefix + strconv.Itoa(evt.Year)
 	fmt.Printf("finding playlist %s\n", tonyPlaylistName)
 
 	myPlaylists := spc.GetMyPlaylists()

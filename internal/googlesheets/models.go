@@ -2,17 +2,16 @@ package googlesheets
 
 import (
 	"strconv"
-	"strings"
 	"tony-g/internal/stringutil"
 )
 
 type AppleTrackRow struct {
-	Title   string
-	Artist  string
-	Album   string
-	Year    int
-	Found   bool
-	AddedAt string
+	Title      string
+	Artist     string
+	Album      string
+	SpotifyUrl string
+	Year       int
+	AddedAt    string
 }
 
 func (atr *AppleTrackRow) GetAppleTrackId() string {
@@ -37,7 +36,7 @@ type YoutubeVideoRow struct {
 type YoutubeTrackRow struct {
 	Title            string
 	Artist           string
-	Found            bool
+	SpotifyUrl       string
 	Link             string
 	VideoId          string
 	VideoPublishDate string
@@ -45,19 +44,19 @@ type YoutubeTrackRow struct {
 }
 
 func RowToAppleTrack(row []interface{}) AppleTrackRow {
-	yearStr := row[3].(string)
+	yearStr := row[4].(string)
 	year, err := strconv.Atoi(yearStr)
 	if err != nil {
 		year = -1
 	}
 
 	return AppleTrackRow{
-		Title:   row[0].(string),
-		Artist:  row[1].(string),
-		Album:   row[2].(string),
-		Year:    year,
-		Found:   strings.ToUpper(row[4].(string)) == "TRUE",
-		AddedAt: row[5].(string),
+		Title:      row[0].(string),
+		Artist:     row[1].(string),
+		Album:      row[2].(string),
+		SpotifyUrl: row[3].(string),
+		Year:       year,
+		AddedAt:    row[5].(string),
 	}
 }
 
@@ -66,8 +65,8 @@ func AppleTrackToRow(track AppleTrackRow) []interface{} {
 	r[0] = track.Title
 	r[1] = track.Artist
 	r[2] = track.Album
-	r[3] = strconv.Itoa(track.Year)
-	r[4] = strings.ToUpper(strconv.FormatBool(track.Found))
+	r[3] = track.SpotifyUrl
+	r[4] = strconv.Itoa(track.Year)
 	r[5] = track.AddedAt
 
 	return r
@@ -111,7 +110,7 @@ func RowToYoutubeTrack(row []interface{}) YoutubeTrackRow {
 	return YoutubeTrackRow{
 		Title:            row[0].(string),
 		Artist:           row[1].(string),
-		Found:            strings.ToUpper(row[2].(string)) == "TRUE",
+		SpotifyUrl:       row[2].(string),
 		Link:             row[3].(string),
 		VideoId:          row[4].(string),
 		VideoPublishDate: row[5].(string),
@@ -123,7 +122,7 @@ func YoutubeTrackToRow(track YoutubeTrackRow) []interface{} {
 	r := make([]interface{}, 7)
 	r[0] = track.Title
 	r[1] = track.Artist
-	r[2] = track.Found
+	r[2] = track.SpotifyUrl
 	r[3] = track.Link
 	r[4] = track.VideoId
 	r[5] = track.VideoPublishDate

@@ -26,8 +26,8 @@ func TestGoogleSheetsModels(t *testing.T) {
 		r[0] = "Metal"
 		r[1] = "D beffs"
 		r[2] = "new album"
-		r[3] = "2025"
-		r[4] = "TRUE"
+		r[3] = "https://open.spotify.com/track/123"
+		r[4] = "2025"
 		r[5] = "soon"
 
 		at := RowToAppleTrack(r)
@@ -44,8 +44,8 @@ func TestGoogleSheetsModels(t *testing.T) {
 		if at.Year != 2025 {
 			t.Errorf("expected year to be 2025. Got %d", at.Year)
 		}
-		if at.Found != true {
-			t.Errorf("expected found to be true. Got %t", at.Found)
+		if at.SpotifyUrl != "https://open.spotify.com/track/123" {
+			t.Errorf("expected SpotifyUrl to be https://open.spotify.com/track/123. Got %s", at.SpotifyUrl)
 		}
 		if at.AddedAt != "soon" {
 			t.Errorf("expected adAddedAt to be soon. Got %s", at.AddedAt)
@@ -54,12 +54,12 @@ func TestGoogleSheetsModels(t *testing.T) {
 
 	t.Run("Apple Track To Row", func(t *testing.T) {
 		at := AppleTrackRow{
-			Title:   "little things",
-			Artist:  "adrianne",
-			Album:   "live at revvy hall",
-			Year:    2025,
-			Found:   true,
-			AddedAt: "now",
+			Title:      "little things",
+			Artist:     "adrianne",
+			Album:      "live at revvy hall",
+			Year:       2025,
+			SpotifyUrl: "https://open.spotify.com/track/123",
+			AddedAt:    "now",
 		}
 
 		row := AppleTrackToRow(at)
@@ -77,11 +77,11 @@ func TestGoogleSheetsModels(t *testing.T) {
 		if row[2] != "live at revvy hall" {
 			t.Errorf("expected row[2] to be live at revvy hall. Got %s", row[2])
 		}
-		if row[3] != "2025" {
-			t.Errorf("expected row[3] to be 2025. Got %s", row[3])
+		if row[3] != "https://open.spotify.com/track/123" {
+			t.Errorf("expected row[3] to be https://open.spotify.com/track/123. Got %s", row[3])
 		}
-		if row[4] != "TRUE" {
-			t.Errorf("expected row[4] to be TRUE. Got %s", row[4])
+		if row[4] != "2025" {
+			t.Errorf("expected row[4] to be 2025. Got %s", row[4])
 		}
 		if row[5] != "now" {
 			t.Errorf("expected row[5] to be now. Got %s", row[5])
@@ -155,7 +155,7 @@ func TestGoogleSheetsModels(t *testing.T) {
 		yt := YoutubeTrackRow{
 			Title:            "little things",
 			Artist:           "adrianne",
-			Found:            true,
+			SpotifyUrl:       "https://open.spotify.com/track/123",
 			Link:             "https://www.youtube.com/watch?v=123",
 			VideoId:          "123",
 			VideoPublishDate: "2025-01-01",
@@ -174,8 +174,8 @@ func TestGoogleSheetsModels(t *testing.T) {
 		if row[1] != "adrianne" {
 			t.Errorf("expected row[1] to be adrianne. Got %s", row[1])
 		}
-		if row[2] != true {
-			t.Errorf("expected row[2] to be true. Got %t", row[2])
+		if row[2] != "https://open.spotify.com/track/123" {
+			t.Errorf("expected row[2] to be https://open.spotify.com/track/123. Got %s", row[2])
 		}
 		if row[3] != "https://www.youtube.com/watch?v=123" {
 			t.Errorf("expected row[3] to be https://www.youtube.com/watch?v=123. Got %s", row[3])
@@ -195,7 +195,7 @@ func TestGoogleSheetsModels(t *testing.T) {
 		r := make([]interface{}, 7)
 		r[0] = "little things"
 		r[1] = "adrianne"
-		r[2] = "TRUE"
+		r[2] = "https://open.spotify.com/track/123"
 		r[3] = "https://www.youtube.com/watch?v=123"
 		r[4] = "123"
 		r[5] = "2025-01-01"
@@ -209,8 +209,8 @@ func TestGoogleSheetsModels(t *testing.T) {
 		if yt.Artist != "adrianne" {
 			t.Errorf("expected artist to be adrianne. Got %s", yt.Artist)
 		}
-		if yt.Found != true {
-			t.Errorf("expected found to be true. Got %t", yt.Found)
+		if yt.SpotifyUrl != "https://open.spotify.com/track/123" {
+			t.Errorf("expected SpotifyUrl to be https://open.spotify.com/track/123. Got %s", yt.SpotifyUrl)
 		}
 		if yt.Link != "https://www.youtube.com/watch?v=123" {
 			t.Errorf("expected link to be https://www.youtube.com/watch?v=123. Got %s", yt.Link)

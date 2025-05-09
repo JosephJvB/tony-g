@@ -2,6 +2,8 @@ package scrapeyoutube
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 	"tony-g/internal/gemini"
 	"tony-g/internal/googlesearch"
@@ -40,7 +42,14 @@ func handleLambdaEvent(evt Evt) {
 
 	yt := youtube.NewClient(paramClient.YoutubeApiKey.Value)
 	allVideos := yt.LoadPlaylistItems()
+	// TODO one at a time
+	// allVideos = []youtube.PlaylistItem{
+	// 	allVideos[0],
+	// }
 	fmt.Printf("Loaded %d youtube videos\n", len(allVideos))
+	if len(allVideos) == 0 {
+		return
+	}
 
 	nextVideos := []youtube.PlaylistItem{}
 	for _, v := range allVideos {
@@ -56,6 +65,9 @@ func handleLambdaEvent(evt Evt) {
 		}
 	}
 	fmt.Printf("%d Youtube Videos to pull tracks from\n", len(nextVideos))
+	if len(nextVideos) == 0 {
+		return
+	}
 
 	gem := gemini.NewClient(
 		paramClient.GeminiApiKey.Value,
@@ -81,7 +93,7 @@ func handleLambdaEvent(evt Evt) {
 			r := googlesheets.YoutubeTrackRow{
 				Title:            t.Title,
 				Artist:           t.Artist,
-				Found:            false,
+				SpotifyUrl:       "",
 				Link:             t.Url,
 				VideoId:          v.Snippet.ResourceId.VideoId,
 				VideoPublishDate: v.Snippet.PublishedAt,
@@ -92,6 +104,9 @@ func handleLambdaEvent(evt Evt) {
 		}
 	}
 	fmt.Printf("Gemini found %d tracks in %d video descriptions\n", len(nextTrackRows), len(nextVideos))
+	if len(nextTrackRows) == 0 {
+		return
+	}
 
 	spc := spotify.NewClient(spotify.Secrets{
 		ClientId:     paramClient.SpotifyClientId.Value,
@@ -103,7 +118,7 @@ func handleLambdaEvent(evt Evt) {
 		Cx:     paramClient.GoogleSearchCx.Value,
 	})
 
-	toAdd := map[int][]string{}
+	toAddByYear := map[int][]string{}
 	foundMap := map[string]int{}
 	for i, t := range nextTrackRows {
 		fmt.Printf("finding track %d/%d\r", i+1, len(nextTrackRows))
@@ -119,32 +134,80 @@ func handleLambdaEvent(evt Evt) {
 			Artist: t.Artist,
 		})
 		if len(res) > 0 {
-			nextTrackRows[i].Found = true
-			toAdd[year] = append(toAdd[year], res[0].Uri)
+			nextTrackRows[i].SpotifyUrl = res[0].Href
+			toAddByYear[year] = append(toAddByYear[year], res[0].Uri)
 			foundMap[t.VideoId]++
 			continue
 		}
 
-		uri, ok := gcs.FindSpotifyTrackUri(googlesearch.FindTrackInput{
+		href, ok := gcs.FindSpotifyTrackHref(googlesearch.FindTrackInput{
 			Title:  t.Title,
 			Artist: t.Artist,
 		})
-		if ok {
-			nextTrackRows[i].Found = true
-			toAdd[year] = append(toAdd[year], uri)
-			foundMap[t.VideoId]++
+		if !ok {
 			continue
+		}
+
+		uri, ok := spotify.LinkToTrackUri(href)
+		if !ok {
+			continue
+		}
+
+		nextTrackRows[i].SpotifyUrl = href
+		toAddByYear[year] = append(toAddByYear[year], uri)
+		foundMap[t.VideoId]++
+		continue
+	}
+
+	myPlaylists := spc.GetMyPlaylists()
+	byYear := map[int]spotify.SpotifyPlaylist{}
+	for _, p := range myPlaylists {
+		if strings.HasPrefix(p.Name, spotify.YoutubePlaylistPrefix) {
+			yearStr := strings.TrimPrefix(p.Name, spotify.YoutubePlaylistPrefix)
+			year, err := strconv.Atoi(yearStr)
+			if err == nil {
+				byYear[year] = p
+			}
 		}
 	}
 
-	// TODO:
-	// for year, uris := range toAdd {
-	// 	// get or create spotify playlist
-	// 	// get spotify playlist items
-	// 	// add those uris that aren't already in playlist
-	// }
+	for year, uris := range toAddByYear {
+		playlistName := spotify.YoutubePlaylistPrefix + strconv.Itoa(year)
+		fmt.Printf("finding playlist %s\n", playlistName)
+
+		fmt.Printf("loaded %d playlists\n", len(myPlaylists))
+
+		// issue: same as previous service, sometimes this code is not finding playlist by name
+		// 1. did I not structure the name correctly?
+		// 2. more likely: I didn't load the right playlist from Spotify
+		// if problem persists, I'll make a new Sheet storing year -> playlistId mapping
+		currentTrackMap := map[string]bool{}
+		playlist, ok := byYear[year]
+		fmt.Printf("spotify playlist for %d exists: %t\n", year, ok)
+
+		if !ok {
+			playlist = spc.CreatePlaylist(playlistName)
+		} else {
+			currentTracks := spc.GetPlaylistItems(playlist.Id)
+			for _, t := range currentTracks {
+				currentTrackMap[t.Track.Id] = true
+			}
+		}
+
+		add := []string{}
+		for _, uri := range uris {
+			if !currentTrackMap[uri] {
+				add = append(add, uri)
+			}
+		}
+
+		spc.AddPlaylistItems(playlist.Id, add)
+	}
 
 	gs.AddYoutubeTracks(nextTrackRows)
+	for i, v := range nextVideoRows {
+		nextVideoRows[i].FoundTracks = foundMap[v.Id]
+	}
 	gs.AddYoutubeVideos(nextVideoRows)
 }
 

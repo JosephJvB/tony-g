@@ -82,20 +82,20 @@ func TestGoogleSheets(t *testing.T) {
 
 		toAdd := []AppleTrackRow{
 			{
-				Title:   "song 9",
-				Artist:  "artist 9",
-				Album:   "album 9",
-				Year:    2023,
-				Found:   true,
-				AddedAt: "2024-04-16T00:00:00.000Z",
+				Title:      "song 9",
+				Artist:     "artist 9",
+				Album:      "album 9",
+				SpotifyUrl: "https://open.spotify.com/track/123",
+				Year:       2023,
+				AddedAt:    "2024-04-16T00:00:00.000Z",
 			},
 			{
-				Title:   "song 2",
-				Artist:  "artist 2",
-				Album:   "album 2",
-				Year:    2025,
-				Found:   true,
-				AddedAt: "2025-04-16T00:00:00.000Z",
+				Title:      "song 2",
+				Artist:     "artist 2",
+				Album:      "album 2",
+				SpotifyUrl: "https://open.spotify.com/track/123",
+				Year:       2025,
+				AddedAt:    "2025-04-16T00:00:00.000Z",
 			},
 		}
 

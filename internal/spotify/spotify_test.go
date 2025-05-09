@@ -329,7 +329,7 @@ func TestSpotify(t *testing.T) {
 
 		fmt.Printf("Found %d playlists\n", len(p))
 
-		playlistName := TonyPlaylistPrefix + "2025"
+		playlistName := ApplePlaylistPrefix + "2025"
 		playlist, ok := SpotifyPlaylist{}, false
 		for _, p := range p {
 			if p.Name == playlistName {

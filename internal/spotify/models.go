@@ -5,7 +5,8 @@ import (
 	"strings"
 )
 
-const TonyPlaylistPrefix = "Now That's What I Call Melon Music: "
+const ApplePlaylistPrefix = "Now That's What I Call Melon Music: "
+const YoutubePlaylistPrefix = "Internet's nerdiest businessman: "
 const JvbSpotifyId = "xnmacgqaaa6a1xi7uy2k1fe7w"
 
 type SpotifyArtist struct {
@@ -70,4 +71,29 @@ func CleanSongTitle(songTitle string) string {
 	songTitle = rmSquareBrackets.ReplaceAllLiteralString(songTitle, "")
 
 	return strings.TrimSpace(songTitle)
+}
+
+// input: https://open.spotify.com/track/0jv5VgdENAPV7lHtBlsaXE
+// output: spotify:track:0jv5VgdENAPV7lHtBlsaXE
+func LinkToTrackUri(link string) (string, bool) {
+	split := strings.Split(link, "/")
+	l := len(split)
+
+	if l < 2 {
+		return "", false
+	}
+
+	id := split[l-1]
+	if len(id) != 22 {
+		return "", false
+	}
+
+	t := split[l-2]
+	if t != "track" {
+		return "", false
+	}
+
+	uri := "spotify:track:" + id
+
+	return uri, true
 }

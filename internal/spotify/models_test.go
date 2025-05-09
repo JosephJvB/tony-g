@@ -32,4 +32,18 @@ func TestUtil(t *testing.T) {
 			t.Errorf("Expected trimmed title to be \"Too Fast (Pull Over)\". Received \"%s\"", title)
 		}
 	})
+
+	t.Run("turns spotify link to uri", func(t *testing.T) {
+		input := "https://open.spotify.com/track/0jv5VgdENAPV7lHtBlsaXE"
+
+		result, ok := LinkToTrackUri(input)
+
+		if !ok {
+			t.Error("linkToTrackUri failed")
+		}
+
+		if result != "spotify:track:0jv5VgdENAPV7lHtBlsaXE" {
+			t.Errorf("Failed to get uri from link. Received %s", result)
+		}
+	})
 }

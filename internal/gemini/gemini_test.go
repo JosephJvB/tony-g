@@ -38,7 +38,7 @@ func TestGemini(t *testing.T) {
 
 	// ooh now this works v nicely
 	t.Run("Can handle case where description has two tracks (limerence/ankles)", func(t *testing.T) {
-		t.Skip("Skip calling real Gemini API")
+		// t.Skip("Skip calling real Gemini API")
 
 		err := godotenv.Load("../../.env")
 		if err != nil {
