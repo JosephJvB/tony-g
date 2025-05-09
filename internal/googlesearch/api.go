@@ -2,8 +2,10 @@ package googlesearch
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/url"
+	"strings"
 
 	"google.golang.org/api/customsearch/v1"
 	"google.golang.org/api/option"
@@ -35,13 +37,19 @@ func NewClient(cfg Config) GoogleSearchClient {
 	}
 }
 
-func (c *GoogleSearchClient) FindSpotifyTrackUrl(q string) (spotifyTrackUrl string, ok bool) {
+type FindTrackInput struct {
+	Title  string
+	Artist string
+}
+
+func (c *GoogleSearchClient) FindSpotifyTrackUri(t FindTrackInput) (spotifyTrackUrl string, ok bool) {
+	q := fmt.Sprintf("%s %s", t.Artist, t.Title)
 	q = url.QueryEscape(q)
 
 	resp, err := c.svc.Cse.List().
 		Cx(c.cx).
 		SiteSearchFilter("i").
-		SiteSearch("https://open.spotify.com").
+		SiteSearch("https://open.spotify.com/track").
 		Num(1).
 		Q(q).
 		Do()
@@ -64,5 +72,30 @@ func (c *GoogleSearchClient) FindSpotifyTrackUrl(q string) (spotifyTrackUrl stri
 		return "", false
 	}
 
-	return resp.Items[0].Link, true
+	return linkToTrackUri(resp.Items[0].Link)
+}
+
+// input: https://open.spotify.com/track/0jv5VgdENAPV7lHtBlsaXE
+// output: spotify:track:0jv5VgdENAPV7lHtBlsaXE
+func linkToTrackUri(link string) (string, bool) {
+	split := strings.Split(link, "/")
+	l := len(split)
+
+	if l < 2 {
+		return "", false
+	}
+
+	id := split[l-1]
+	if len(id) != 22 {
+		return "", false
+	}
+
+	t := split[l-2]
+	if t != "track" {
+		return "", false
+	}
+
+	uri := "spotify:track:" + id
+
+	return uri, true
 }

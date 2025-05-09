@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	"tony-g/internal/apple"
 
 	"github.com/joho/godotenv"
 )
@@ -185,10 +184,9 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(apple.ScrapedTrack{
+		found := s.FindTrack(FindTrackInput{
 			Title:  "My Golden Years",
 			Artist: "The Lemon Twigs",
-			Year:   2025,
 		})
 
 		if len(found) == 0 {
@@ -219,10 +217,9 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(apple.ScrapedTrack{
+		found := s.FindTrack(FindTrackInput{
 			Title:  "Somethin' (feat. Sexyy Red)",
 			Artist: "Nardo Wick",
-			Year:   2025,
 		})
 
 		if len(found) == 0 {
@@ -253,12 +250,11 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(apple.ScrapedTrack{
+		found := s.FindTrack(FindTrackInput{
 			// i think i gotta trim "(feat. ...)" and "[feat. ...]"
 			Title: "FUNKFEST (feat. TJOnline)", // fails
 			// Title:  "FUNKFEST)", // works
 			Artist: "grouptherapy., Jadagrace & SWIM",
-			Year:   2023,
 		})
 
 		if len(found) == 0 {
@@ -289,12 +285,11 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(apple.ScrapedTrack{
+		found := s.FindTrack(FindTrackInput{
 			// i think i gotta trim "(feat. ...)" and "[feat. ...]"
 			Title: "Times Is Rough (feat. Heem B$F & Rick Hyde)", // fails
 			// Title:  "Times Is Rough", // works
 			Artist: "Black Soprano Family, Benny the Butcher & DJ Premier",
-			Year:   2022,
 		})
 
 		if len(found) == 0 {
@@ -371,7 +366,7 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(apple.ScrapedTrack{
+		found := s.FindTrack(FindTrackInput{
 			Title:  "Blood on the Fang", // fails
 			Artist: "clipping.",
 		})

@@ -13,11 +13,14 @@ function onChange(e) {
   var sheet = ss.getActiveSheet()
 
   switch (sheet.getName()) {
-    case 'Scraped Tracks':
+    case 'Apple Tracks':
       sortScrapedTracks(sheet)
       break
     case 'Youtube Videos':
       sortYoutubeVideos(sheet)
+      break
+    case 'Youtube Tracks':
+      sortYoutubeTracks(sheet)
       break
   }
 }
@@ -30,8 +33,16 @@ function sortScrapedTracks(sheet) {
   ])
 }
 function sortYoutubeVideos(sheet) {
-  var range = sheet.getRange('A2:D')
+  var range = sheet.getRange('A2:E')
   range.sort([
     { column: 3, ascending: false }, // published_at
+    { column: 5, ascending: false }, // added_at
+  ])
+}
+function sortYoutubeTracks(sheet) {
+  var range = sheet.getRange('A2:G')
+  range.sort([
+    { column: 6, ascending: false }, // videopublish date
+    { column: 7, ascending: false }, // added_at
   ])
 }

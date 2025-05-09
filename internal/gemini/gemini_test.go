@@ -28,16 +28,10 @@ func TestGemini(t *testing.T) {
 
 		result := client.ParseYoutubeDescription(description)
 
-		fmt.Println(result.Text())
+		fmt.Printf("got tracks %d", len(result))
 
-		d, err := result.MarshalJSON()
-		if err != nil {
-			panic(err)
-		}
-
-		err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
-		if err != nil {
-			panic(err)
+		if len(result) == 13 {
+			t.Errorf("failed to load youtube tracks from description. Got %d, Expected 13", len(result))
 		}
 	})
 
@@ -87,9 +81,8 @@ func TestGemini(t *testing.T) {
 
 		tracks := []ParsedTrack{
 			{
-				Title:     "Blood on the Fang",
-				Artist:    "clipping.",
-				SpotifyId: "",
+				Title:  "Blood on the Fang",
+				Artist: "clipping.",
 			},
 		}
 
@@ -102,7 +95,7 @@ func TestGemini(t *testing.T) {
 
 	// ooh now this works v nicely
 	t.Run("Can handle case where description has two tracks (limerence/ankles)", func(t *testing.T) {
-		// t.Skip("Skip calling real Gemini API")
+		t.Skip("Skip calling real Gemini API")
 
 		err := godotenv.Load("../../.env")
 		if err != nil {
@@ -115,18 +108,10 @@ func TestGemini(t *testing.T) {
 
 		client := NewClient(apiKey)
 
-		result := client.ParseYoutubeDescription(description)
+		tracks := client.ParseYoutubeDescription(description)
 
-		fmt.Println(result.Text())
-
-		d, err := result.MarshalJSON()
-		if err != nil {
-			panic(err)
-		}
-
-		err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
-		if err != nil {
-			panic(err)
+		if len(tracks) == 8 {
+			t.Errorf("Failed to get all tracks from youtube description. Got %d, expected 8", len(tracks))
 		}
 	})
 }

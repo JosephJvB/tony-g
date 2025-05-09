@@ -35,7 +35,6 @@ type YoutubeVideoRow struct {
 	AddedAt     string
 }
 type YoutubeTrackRow struct {
-	Id               string
 	Title            string
 	Artist           string
 	Found            bool
@@ -110,7 +109,6 @@ func YoutubeVideoToRow(video YoutubeVideoRow) []interface{} {
 
 func RowToYoutubeTrack(row []interface{}) YoutubeTrackRow {
 	return YoutubeTrackRow{
-		Id:               "",
 		Title:            row[0].(string),
 		Artist:           row[1].(string),
 		Found:            strings.ToUpper(row[2].(string)) == "TRUE",

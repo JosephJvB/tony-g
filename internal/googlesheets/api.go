@@ -22,7 +22,7 @@ var AppleTrackSheet = SheetConfig{
 	AllRowRange: "A2:F",
 }
 
-var YoutubeVideosSheet = SheetConfig{
+var YoutubeVideoSheet = SheetConfig{
 	Name:        "Youtube Videos",
 	Id:          1649352476,
 	AllRowRange: "A2:F",
@@ -66,17 +66,10 @@ func NewClient(secrets Secrets) GoogleSheetsClient {
 }
 
 func (gs *GoogleSheetsClient) GetAppleTracks() []AppleTrackRow {
-	sheetRange := AppleTrackSheet.Name + "!" + AppleTrackSheet.AllRowRange
-
-	resp, err := gs.sheetsService.Spreadsheets.Values.
-		Get(SpreadsheetId, sheetRange).
-		Do()
-	if err != nil {
-		panic(err)
-	}
+	rows := gs.getRows(AppleTrackSheet)
 
 	tracks := []AppleTrackRow{}
-	for _, row := range resp.Values {
+	for _, row := range rows {
 		r := RowToAppleTrack(row)
 
 		tracks = append(tracks, r)
@@ -94,13 +87,80 @@ func (gs *GoogleSheetsClient) AddAppleTracks(nextRows []AppleTrackRow) {
 		rows = append(rows, r)
 	}
 
+	gs.addRows(AppleTrackSheet, rows)
+}
+
+func (gs *GoogleSheetsClient) GetYoutubeVideos() []YoutubeVideoRow {
+	rows := gs.getRows(YoutubeVideoSheet)
+
+	videos := []YoutubeVideoRow{}
+	for _, row := range rows {
+		r := RowToYoutubeVideo(row)
+
+		videos = append(videos, r)
+	}
+
+	return videos
+}
+
+func (gs *GoogleSheetsClient) AddYoutubeVideos(nextRows []YoutubeVideoRow) {
+	// sheets.ValueRange.Values needs interfaces
+	rows := make([][]interface{}, len(nextRows))
+	for _, t := range nextRows {
+		r := YoutubeVideoToRow(t)
+
+		rows = append(rows, r)
+	}
+
+	gs.addRows(YoutubeVideoSheet, rows)
+}
+
+func (gs *GoogleSheetsClient) GetYoutubeTracks() []YoutubeTrackRow {
+	rows := gs.getRows(YoutubeTrackSheet)
+
+	tracks := []YoutubeTrackRow{}
+	for _, row := range rows {
+		r := RowToYoutubeTrack(row)
+
+		tracks = append(tracks, r)
+	}
+
+	return tracks
+}
+
+func (gs *GoogleSheetsClient) AddYoutubeTracks(nextRows []YoutubeTrackRow) {
+	// sheets.ValueRange.Values needs interfaces
+	rows := make([][]interface{}, len(nextRows))
+	for _, t := range nextRows {
+		r := YoutubeTrackToRow(t)
+
+		rows = append(rows, r)
+	}
+
+	gs.addRows(YoutubeTrackSheet, rows)
+}
+
+func (gs *GoogleSheetsClient) getRows(cfg SheetConfig) [][]interface{} {
+	sheetRange := cfg.Name + "!" + cfg.AllRowRange
+
+	resp, err := gs.sheetsService.Spreadsheets.Values.
+		Get(SpreadsheetId, sheetRange).
+		Do()
+	if err != nil {
+		panic(err)
+	}
+
+	return resp.Values
+}
+
+func (gs *GoogleSheetsClient) addRows(cfg SheetConfig, rows [][]interface{}) {
 	// set next rows
 	valueRange := sheets.ValueRange{
 		MajorDimension: "ROWS",
 		Values:         rows,
 	}
 	// is this range gonna append rows the way I want?
-	rowRange := AppleTrackSheet.Name + "!" + AppleTrackSheet.AllRowRange
+	rowRange := cfg.Name + "!" + cfg.AllRowRange
 	req := gs.sheetsService.Spreadsheets.Values.Append(SpreadsheetId, rowRange, &valueRange)
 	// is this the only way to add these params?
 	req.ValueInputOption("RAW")

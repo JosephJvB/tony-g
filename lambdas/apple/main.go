@@ -91,17 +91,10 @@ func handleLambdaEvent(evt Evt) {
 	foundTracks := []spotify.SpotifyTrack{}
 	for i, t := range toLookup {
 		fmt.Printf("finding track %d/%d\r", i+1, len(toLookup))
-		results := spc.FindTrack(t)
-
-		// on first failure - try normalize track title
-		if len(results) == 0 {
-			withoutFeatureStr := spotify.CleanSongTitle(t.Title)
-			if withoutFeatureStr != t.Title {
-				t2 := t
-				t2.Title = withoutFeatureStr
-				results = spc.FindTrack(t2)
-			}
-		}
+		results := spc.FindTrack(spotify.FindTrackInput{
+			Title:  t.Title,
+			Artist: t.Artist,
+		})
 
 		if len(results) > 0 {
 			foundTracks = append(foundTracks, results[0])

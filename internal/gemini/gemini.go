@@ -2,15 +2,16 @@ package gemini
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
 	"google.golang.org/genai"
 )
 
 type ParsedTrack struct {
-	Title     string `json:"title"`
-	Artist    string `json:"artist"`
-	SpotifyId string `json:"spotifyId"`
+	Title  string `json:"title"`
+	Artist string `json:"artist"`
+	Link   string `json:"link"`
 }
 
 type GeminiClient struct {
@@ -34,7 +35,7 @@ func NewClient(apiKey string) GeminiClient {
 	}
 }
 
-func (c *GeminiClient) ParseYoutubeDescription(description string) *genai.GenerateContentResponse {
+func (c *GeminiClient) ParseYoutubeDescription(description string) []ParsedTrack {
 	input := "Return the Best Tracks mentioned in the following text snippet:\n" + description
 
 	result, err := c.client.Models.GenerateContent(
@@ -55,6 +56,7 @@ func (c *GeminiClient) ParseYoutubeDescription(description string) *genai.Genera
 					Properties: map[string]*genai.Schema{
 						"title":  {Type: genai.TypeString},
 						"artist": {Type: genai.TypeString},
+						"link":   {Type: genai.TypeString},
 					},
 				},
 			},
@@ -64,7 +66,23 @@ func (c *GeminiClient) ParseYoutubeDescription(description string) *genai.Genera
 		log.Fatal(err)
 	}
 
-	return result
+	// d, err := result.MarshalJSON()
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	parsedTracks := []ParsedTrack{}
+	err = json.Unmarshal([]byte(result.Text()), &parsedTracks)
+	if err != nil {
+		log.Fatalf("ParseYoutubeDescription: Failed to parse response JSON")
+	}
+
+	return parsedTracks
 }
 
 // Try to fix any typos that come from Youtube Video Description Text Snippet

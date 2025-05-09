@@ -22,14 +22,30 @@ func TestGoogleSearchApi(t *testing.T) {
 		}
 		client := NewClient(cfg)
 
-		q := "spotify track clipping blood on the fang"
-		result, ok := client.FindSpotifyTrackUrl(q)
+		result, ok := client.FindSpotifyTrackUri(FindTrackInput{
+			Title:  "Blood on the Fang",
+			Artist: "clipping.",
+		})
 		if !ok {
 			t.Error("Failed to find spotify track clipping blood on the fang")
 		}
 
-		if result != "https://open.spotify.com/track/0jv5VgdENAPV7lHtBlsaXE" {
-			t.Errorf("Expected \"https://open.spotify.com/track/0jv5VgdENAPV7lHtBlsaXE\" received \"%s\"", result)
+		if result != "spotify:track:0jv5VgdENAPV7lHtBlsaXE" {
+			t.Errorf("Expected \"spotify:track:0jv5VgdENAPV7lHtBlsaXE\" received \"%s\"", result)
+		}
+	})
+
+	t.Run("turns spotify link to uri", func(t *testing.T) {
+		input := "https://open.spotify.com/track/0jv5VgdENAPV7lHtBlsaXE"
+
+		result, ok := linkToTrackUri(input)
+
+		if !ok {
+			t.Error("linkToTrackUri failed")
+		}
+
+		if result != "spotify:track:0jv5VgdENAPV7lHtBlsaXE" {
+			t.Errorf("Failed to get uri from link. Received %s", result)
 		}
 	})
 }
