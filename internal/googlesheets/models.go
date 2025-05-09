@@ -66,8 +66,8 @@ func AppleTrackToRow(track AppleTrackRow) []interface{} {
 	r[0] = track.Title
 	r[1] = track.Artist
 	r[2] = track.Album
-	r[3] = track.Year
-	r[4] = track.Found
+	r[3] = strconv.Itoa(track.Year)
+	r[4] = strings.ToUpper(strconv.FormatBool(track.Found))
 	r[5] = track.AddedAt
 
 	return r
