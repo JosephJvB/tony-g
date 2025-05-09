@@ -51,7 +51,7 @@ func handleLambdaEvent(evt Evt) {
 			continue
 		}
 
-		if !prevVideoMap[v.Id] {
+		if !prevVideoMap[v.Snippet.ResourceId.VideoId] {
 			nextVideos = append(nextVideos, v)
 		}
 	}
@@ -68,7 +68,7 @@ func handleLambdaEvent(evt Evt) {
 		nextTracks := gem.ParseYoutubeDescription(v.Snippet.Description)
 
 		nv := googlesheets.YoutubeVideoRow{
-			Id:          v.Id,
+			Id:          v.Snippet.ResourceId.VideoId,
 			Title:       v.Snippet.Title,
 			PublishedAt: v.Snippet.PublishedAt,
 			TotalTracks: len(nextTracks),
@@ -82,8 +82,8 @@ func handleLambdaEvent(evt Evt) {
 				Title:            t.Title,
 				Artist:           t.Artist,
 				Found:            false,
-				Link:             t.Link,
-				VideoId:          v.Id,
+				Link:             t.Url,
+				VideoId:          v.Snippet.ResourceId.VideoId,
 				VideoPublishDate: v.Snippet.PublishedAt,
 				AddedAt:          timestamp,
 			}

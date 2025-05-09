@@ -1,6 +1,7 @@
 package gemini
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
@@ -35,64 +36,6 @@ func TestGemini(t *testing.T) {
 		}
 	})
 
-	// issue is that Spotify will not return the track with these properties
-	// maybe I should do this with a programmatic google search
-	// this does work though...
-	t.Run("Find valid track name and artist with typo", func(t *testing.T) {
-		t.Skip("Skip calling real Gemini API")
-
-		err := godotenv.Load("../../.env")
-		if err != nil {
-			t.Errorf("Error loading .env file")
-		}
-
-		input := "Blood on the Fang - clipping."
-
-		apiKey := os.Getenv("GEMINI_API_KEY")
-
-		client := NewClient(apiKey)
-
-		result := client.ValidateSongProperties(input)
-
-		fmt.Println(result.Text())
-
-		d, err := result.MarshalJSON()
-		if err != nil {
-			panic(err)
-		}
-
-		err = os.WriteFile("../../data/gemini-validatesong-resp.json", d, 0666)
-		if err != nil {
-			panic(err)
-		}
-	})
-
-	// doesn't work :/
-	t.Run("Can find valid spotify id for clipping even with spelling error", func(t *testing.T) {
-		t.Skip("Skip calling real Gemini API")
-
-		// REAL
-		// https://open.spotify.com/track/0jv5VgdENAPV7lHtBlsaXE
-
-		err := godotenv.Load("../../.env")
-		if err != nil {
-			t.Errorf("Error loading .env file")
-		}
-
-		tracks := []ParsedTrack{
-			{
-				Title:  "Blood on the Fang",
-				Artist: "clipping.",
-			},
-		}
-
-		apiKey := os.Getenv("GEMINI_API_KEY")
-
-		client := NewClient(apiKey)
-
-		client.FindSpotifyUrls(tracks)
-	})
-
 	// ooh now this works v nicely
 	t.Run("Can handle case where description has two tracks (limerence/ankles)", func(t *testing.T) {
 		t.Skip("Skip calling real Gemini API")
@@ -110,7 +53,17 @@ func TestGemini(t *testing.T) {
 
 		tracks := client.ParseYoutubeDescription(description)
 
-		if len(tracks) == 8 {
+		d, err := json.MarshalIndent(tracks, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
+		if err != nil {
+			panic(err)
+		}
+
+		if len(tracks) != 8 {
 			t.Errorf("Failed to get all tracks from youtube description. Got %d, expected 8", len(tracks))
 		}
 	})

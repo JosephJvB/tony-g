@@ -17,13 +17,16 @@ type YoutubeClient struct {
 }
 
 type PlaylistItem struct {
-	Id      string `json:"id"`
 	Snippet struct {
 		Title               string `json:"title"`
 		Description         string `json:"description"`
 		PublishedAt         string `json:"publishedAt"`
 		VideoOwnerChannelId string `json:"videoOwnerChannelId"`
 		ChannelId           string `json:"channelId"`
+		ResourceId          struct {
+			Kind    string `json:"kind"`
+			VideoId string `json:"videoId"`
+		} `json:"resourceId"`
 	} `json:"snippet"`
 	Status struct {
 		PrivacyStatus string `json:"privacyStatus"`

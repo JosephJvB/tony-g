@@ -68,9 +68,13 @@ func TestYoutube(t *testing.T) {
 			Reply(200).
 			JSON(map[string]any{
 				"nextPageToken": testPageToken,
-				"items": []PlaylistItem{
+				"items": []map[string]any{
 					{
-						Id: "_test_id1",
+						"snippet": map[string]any{
+							"resourceId": map[string]any{
+								"videoId": "_test_id1",
+							},
+						},
 					},
 				},
 			})
@@ -85,9 +89,13 @@ func TestYoutube(t *testing.T) {
 			Reply(200).
 			JSON(map[string]any{
 				"nextPageToken": "",
-				"items": []PlaylistItem{
+				"items": []map[string]any{
 					{
-						Id: "_test_id2",
+						"snippet": map[string]any{
+							"resourceId": map[string]any{
+								"videoId": "_test_id2",
+							},
+						},
 					},
 				},
 			})
@@ -100,11 +108,11 @@ func TestYoutube(t *testing.T) {
 			t.Errorf("Expected to load two playlist items received %d", len(items))
 		}
 
-		if items[0].Id != "_test_id1" {
-			t.Errorf("Expected test playlist item 1 to have Id _test_id1. Received %s", items[0].Id)
+		if items[0].Snippet.ResourceId.VideoId != "_test_id1" {
+			t.Errorf("Expected test playlist item 1 to have Id _test_id1. Received %s", items[0].Snippet.ResourceId.VideoId)
 		}
-		if items[1].Id != "_test_id2" {
-			t.Errorf("Expected test playlist item 2 to have Id _test_id2. Received %s", items[1].Id)
+		if items[1].Snippet.ResourceId.VideoId != "_test_id2" {
+			t.Errorf("Expected test playlist item 2 to have Id _test_id2. Received %s", items[1].Snippet.ResourceId.VideoId)
 		}
 	})
 }
