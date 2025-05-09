@@ -131,3 +131,31 @@ so, the steps:
    3. ~~scrape google search results~~ doesnt work
 
 I dont think husky precommit is working on this machine :(
+
+Or maybe this:
+
+1. gemini gets tracklist from description(s)
+2. Search in spotify for each
+3. Add found to Playlist
+4. Add all rows to spreadsheet (found and not)
+
+Separate lambda on cron:
+
+1. called once per day
+2. lookup all google sheet rows
+3. Find all not found rows
+4. limit to 100 - daily customsearch rate limit
+5. search for missing tracks
+6. add found to playlist
+7. update all rows
+
+columns might need update
+
+- found by spotify search
+- found by google search
+
+  - so that way I don't keep retrying songs that weren't found first time
+
+  But that's like quite a complicated thing
+  So maybe it's better to just try to find the missing ones at the time
+  There should never really be a time when I need to look up more than 100 in a day right so it's kinda dumb.
