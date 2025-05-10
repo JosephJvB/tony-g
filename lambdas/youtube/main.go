@@ -1,4 +1,4 @@
-package scrapeyoutube
+package main
 
 import (
 	"fmt"
@@ -134,7 +134,7 @@ func handleLambdaEvent(evt Evt) {
 			Artist: t.Artist,
 		})
 		if len(res) > 0 {
-			nextTrackRows[i].SpotifyUrl = res[0].Href
+			nextTrackRows[i].SpotifyUrl = res[0].ExternalUrls.Spotify
 			toAddByYear[year] = append(toAddByYear[year], res[0].Uri)
 			foundMap[t.VideoId]++
 			continue

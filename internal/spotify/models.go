@@ -6,7 +6,7 @@ import (
 )
 
 const ApplePlaylistPrefix = "Now That's What I Call Melon Music: "
-const YoutubePlaylistPrefix = "Internet's nerdiest businessman: "
+const YoutubePlaylistPrefix = "Melon Music (Deluxe): "
 const JvbSpotifyId = "xnmacgqaaa6a1xi7uy2k1fe7w"
 
 type SpotifyArtist struct {
@@ -17,11 +17,14 @@ type SpotifyArtist struct {
 }
 
 type SpotifyTrack struct {
-	Id      string          `json:"id"`
-	Uri     string          `json:"uri"`
-	Href    string          `json:"href"`
-	Name    string          `json:"name"`
-	Artists []SpotifyArtist `json:"artists"`
+	Id           string          `json:"id"`
+	Uri          string          `json:"uri"`
+	Href         string          `json:"href"`
+	Name         string          `json:"name"`
+	Artists      []SpotifyArtist `json:"artists"`
+	ExternalUrls struct {
+		Spotify string `json:"spotify"`
+	} `json:"external_urls"`
 }
 
 type SpotifyPlaylistItem struct {

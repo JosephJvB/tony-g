@@ -1,4 +1,4 @@
-package scrapeapple
+package main
 
 import (
 	"fmt"
@@ -98,15 +98,17 @@ func handleLambdaEvent(evt Evt) {
 			Artist: t.Artist,
 		})
 
+		href := ""
 		if len(results) > 0 {
 			foundTracks = append(foundTracks, results[0])
+			href = results[0].ExternalUrls.Spotify
 		}
 
 		nextRows = append(nextRows, googlesheets.AppleTrackRow{
 			Title:      t.Title,
 			Artist:     t.Artist,
 			Album:      t.Album,
-			SpotifyUrl: results[0].Href,
+			SpotifyUrl: href,
 			Year:       t.Year,
 			AddedAt:    timestamp,
 		})

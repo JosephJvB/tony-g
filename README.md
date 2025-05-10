@@ -159,3 +159,19 @@ columns might need update
   But that's like quite a complicated thing
   So maybe it's better to just try to find the missing ones at the time
   There should never really be a time when I need to look up more than 100 in a day right so it's kinda dumb.
+
+how to I wanna launch this
+
+1. Apple Playlist:
+   . delete current playlists? Or at least rename them so they don't get in the way
+   . test at least one year locally first
+   . Deploy as lambda
+   . Use Lambda to go thru backlog - using test input year
+
+1. Youtube Playlists
+   . using a new playlist prefix so existing lists won't be affected
+   . Test a few videos locally first
+   . Use Lambda to go thru backlog - using test input video ids
+
+Could everything be in package main?? Have i been overcomplicating the package names
+I strongly suspect ya yes yup
