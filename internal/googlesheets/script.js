@@ -14,7 +14,7 @@ function onChange(e) {
 
   switch (sheet.getName()) {
     case 'Apple Tracks':
-      sortScrapedTracks(sheet)
+      sortAppleTracks(sheet)
       break
     case 'Youtube Videos':
       sortYoutubeVideos(sheet)
@@ -25,10 +25,10 @@ function onChange(e) {
   }
 }
 
-function sortScrapedTracks(sheet) {
+function sortAppleTracks(sheet) {
   var range = sheet.getRange('A2:F')
   range.sort([
-    { column: 4, ascending: false }, // year
+    { column: 5, ascending: false }, // year
     { column: 6, ascending: false }, // added_at
   ])
 }
