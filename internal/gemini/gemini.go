@@ -36,7 +36,7 @@ func NewClient(apiKey string) GeminiClient {
 }
 
 func (c *GeminiClient) ParseYoutubeDescription(description string) []ParsedTrack {
-	input := "Return the Best Tracks mentioned in the following text snippet\n" + description
+	input := "Return the Best Tracks mentioned in the following text snippet\nTracks are usually listed in format {artist} - {title}\n" + description
 
 	result, err := c.client.Models.GenerateContent(
 		c.ctx,

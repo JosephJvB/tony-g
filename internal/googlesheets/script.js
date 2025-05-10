@@ -33,10 +33,10 @@ function sortAppleTracks(sheet) {
   ])
 }
 function sortYoutubeVideos(sheet) {
-  var range = sheet.getRange('A2:E')
+  var range = sheet.getRange('A2:F')
   range.sort([
     { column: 3, ascending: false }, // published_at
-    { column: 5, ascending: false }, // added_at
+    { column: 6, ascending: false }, // added_at
   ])
 }
 function sortYoutubeTracks(sheet) {

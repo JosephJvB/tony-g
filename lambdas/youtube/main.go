@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -12,7 +13,7 @@ import (
 	"tony-g/internal/ssm"
 	"tony-g/internal/youtube"
 
-	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/joho/godotenv"
 )
 
 // TODO: only parse videos in input event
@@ -42,16 +43,17 @@ func handleLambdaEvent(evt Evt) {
 
 	yt := youtube.NewClient(paramClient.YoutubeApiKey.Value)
 	allVideos := yt.LoadPlaylistItems()
-	// TODO one at a time
-	// allVideos = []youtube.PlaylistItem{
-	// 	allVideos[0],
-	// }
 	fmt.Printf("Loaded %d youtube videos\n", len(allVideos))
 	if len(allVideos) == 0 {
 		return
 	}
 
 	nextVideos := []youtube.PlaylistItem{}
+	// custom hacking
+	// 479 videos total
+	avl := len(allVideos)
+	allVideos = allVideos[avl-100 : avl-1]
+	// custom hacking
 	for _, v := range allVideos {
 		if v.Status.PrivacyStatus == "private" {
 			continue
@@ -59,10 +61,16 @@ func handleLambdaEvent(evt Evt) {
 		if v.Snippet.ChannelId != v.Snippet.VideoOwnerChannelId {
 			continue
 		}
-
-		if !prevVideoMap[v.Snippet.ResourceId.VideoId] {
-			nextVideos = append(nextVideos, v)
+		if prevVideoMap[v.Snippet.ResourceId.VideoId] {
+			continue
 		}
+		if len(evt.VideoIds) > 0 {
+			if !slices.Contains(evt.VideoIds, v.Snippet.ResourceId.VideoId) {
+				continue
+			}
+		}
+
+		nextVideos = append(nextVideos, v)
 	}
 	fmt.Printf("%d Youtube Videos to pull tracks from\n", len(nextVideos))
 	if len(nextVideos) == 0 {
@@ -120,6 +128,7 @@ func handleLambdaEvent(evt Evt) {
 
 	toAddByYear := map[int][]string{}
 	foundMap := map[string]int{}
+	totalFound := 0
 	for i, t := range nextTrackRows {
 		fmt.Printf("finding track %d/%d\r", i+1, len(nextTrackRows))
 
@@ -137,9 +146,11 @@ func handleLambdaEvent(evt Evt) {
 			nextTrackRows[i].SpotifyUrl = res[0].ExternalUrls.Spotify
 			toAddByYear[year] = append(toAddByYear[year], res[0].Uri)
 			foundMap[t.VideoId]++
+			totalFound++
 			continue
 		}
 
+		fmt.Printf("\nFallback to google search for \"%s by %s\"\n", t.Title, t.Artist)
 		href, ok := gcs.FindSpotifyTrackHref(googlesearch.FindTrackInput{
 			Title:  t.Title,
 			Artist: t.Artist,
@@ -156,10 +167,13 @@ func handleLambdaEvent(evt Evt) {
 		nextTrackRows[i].SpotifyUrl = href
 		toAddByYear[year] = append(toAddByYear[year], uri)
 		foundMap[t.VideoId]++
-		continue
+		totalFound++
 	}
 
+	fmt.Printf("Found %d / %d tracks\n", totalFound, len(nextTrackRows))
+
 	myPlaylists := spc.GetMyPlaylists()
+	fmt.Printf("Loaded %d playlists\n", len(myPlaylists))
 	byYear := map[int]spotify.SpotifyPlaylist{}
 	for _, p := range myPlaylists {
 		if strings.HasPrefix(p.Name, spotify.YoutubePlaylistPrefix) {
@@ -175,8 +189,6 @@ func handleLambdaEvent(evt Evt) {
 		playlistName := spotify.YoutubePlaylistPrefix + strconv.Itoa(year)
 		fmt.Printf("finding playlist %s\n", playlistName)
 
-		fmt.Printf("loaded %d playlists\n", len(myPlaylists))
-
 		// issue: same as previous service, sometimes this code is not finding playlist by name
 		// 1. did I not structure the name correctly?
 		// 2. more likely: I didn't load the right playlist from Spotify
@@ -186,9 +198,11 @@ func handleLambdaEvent(evt Evt) {
 		fmt.Printf("spotify playlist for %d exists: %t\n", year, ok)
 
 		if !ok {
+			fmt.Printf("creating spotify playlist: %d\n", year)
 			playlist = spc.CreatePlaylist(playlistName)
 		} else {
 			currentTracks := spc.GetPlaylistItems(playlist.Id)
+			fmt.Printf("loaded %d tracks for playlist: %d\n", len(currentTracks), year)
 			for _, t := range currentTracks {
 				currentTrackMap[t.Track.Id] = true
 			}
@@ -201,16 +215,24 @@ func handleLambdaEvent(evt Evt) {
 			}
 		}
 
+		fmt.Printf("adding %d tracks to playlist %s\n", len(add), playlistName)
 		spc.AddPlaylistItems(playlist.Id, add)
 	}
 
+	fmt.Printf("Adding %d track rows to google sheets\n", len(nextTrackRows))
 	gs.AddYoutubeTracks(nextTrackRows)
 	for i, v := range nextVideoRows {
 		nextVideoRows[i].FoundTracks = foundMap[v.Id]
 	}
+
+	fmt.Printf("Adding %d video rows to google sheets\n", len(nextVideoRows))
 	gs.AddYoutubeVideos(nextVideoRows)
 }
 
 func main() {
-	lambda.Start(handleLambdaEvent)
+	// lambda.Start(handleLambdaEvent)
+	godotenv.Load(".env")
+	handleLambdaEvent(Evt{
+		VideoIds: []string{},
+	})
 }

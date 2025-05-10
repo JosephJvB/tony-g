@@ -38,7 +38,7 @@ func TestGemini(t *testing.T) {
 
 	// ooh now this works v nicely
 	t.Run("Can handle case where description has two tracks (limerence/ankles)", func(t *testing.T) {
-		// t.Skip("Skip calling real Gemini API")
+		t.Skip("Skip calling real Gemini API")
 
 		err := godotenv.Load("../../.env")
 		if err != nil {
@@ -65,6 +65,33 @@ func TestGemini(t *testing.T) {
 
 		if len(tracks) != 8 {
 			t.Errorf("Failed to get all tracks from youtube description. Got %d, expected 8", len(tracks))
+		}
+	})
+
+	t.Run("Can get correct properties for video EGwEmD7EfXg", func(t *testing.T) {
+		t.Skip("Skip calling real Gemini API")
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			t.Errorf("Error loading .env file")
+		}
+
+		description := "Amazon link:\nhttp://amzn.to/1KZmdWI\n\nScHoolboy Q - Tookie Knows II: Part (2)\nhttp://www.theneedledrop.com/articles/2016/7/schoolboy-q-tookie-knows-ii-part-2\n\nBADBADNOTGOOD - In Your Eyes ft. Charlotte Day Wilson\nhttp://www.theneedledrop.com/articles/2016/7/badbadnotgood-in-your-eyes-ft-charlotte-day-wilson\n\nMaxo Kream - The Persona Tape\nhttp://www.theneedledrop.com/articles/2016/7/3c72tw2w4uiygl2yszyjrn6wckts5l\n\nThelonious Martin - Bomaye ft. Joey Purp\nhttp://www.theneedledrop.com/articles/2016/7/thelonious-martin-bomaye-ft-joey-purp\n\nclipping. - Wriggle (music vid)\nhttp://www.theneedledrop.com/articles/2016/7/clipping-wriggle\n\nAngel Olsen - Shut Up Kiss Me\nhttp://www.theneedledrop.com/articles/2016/7/angel-olsen-shut-up-kiss-me\n\nGhoul - Bringer of War\nhttp://www.theneedledrop.com/articles/2016/7/ghoul-bringer-of-war\n\n===================================\nSubscribe: http://bit.ly/1pBqGCN\n\nOfficial site: http://theneedledrop.com\n\nTND Twitter: http://twitter.com/theneedledrop\n\nTND Facebook: http://facebook.com/theneedledrop\n\nSupport TND: http://theneedledrop.com/support\n===================================\n\nFAV TRACKS:\n\nLEAST FAV TRACK:\n\nArtist- Album / Year / Label / Genre\n\n/10\n\nY'all know this is just my opinion, right?"
+
+		apiKey := os.Getenv("GEMINI_API_KEY")
+
+		client := NewClient(apiKey)
+
+		tracks := client.ParseYoutubeDescription(description)
+
+		d, err := json.MarshalIndent(tracks, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
+		if err != nil {
+			panic(err)
 		}
 	})
 }
