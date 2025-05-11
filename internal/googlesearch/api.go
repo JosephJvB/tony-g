@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"os"
 
 	"google.golang.org/api/customsearch/v1"
 	"google.golang.org/api/option"
@@ -42,6 +43,11 @@ type FindTrackInput struct {
 }
 
 func (c *GoogleSearchClient) FindSpotifyTrackHref(t FindTrackInput) (spotifyTrackUrl string, ok bool) {
+	if os.Getenv("GOOGLE_SEARCH_DISABLED") != "" {
+		fmt.Println("Google Search disabled by .env var \"GOOGLE_SEARCH_DISABLED\"")
+		return "", false
+	}
+
 	q := fmt.Sprintf("%s %s", t.Artist, t.Title)
 	q = url.QueryEscape(q)
 
