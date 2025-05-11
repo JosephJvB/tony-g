@@ -64,14 +64,20 @@ type SpotifyTokenResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
-// https://stackoverflow.com/questions/4292468/javascript-regex-remove-text-between-parentheses#answer-4292483
-// .replace(/*\([^)]*\)*/g, ”)
-// maybe need to handle "ft." ? but this seems enough for now
 func CleanSongTitle(songTitle string) string {
+	// Apple music main cases are (feat. ...) and [feat. ...]
 	rmParens := regexp.MustCompile(`\\*\(feat.[^)]*\)*`)
 	rmSquareBrackets := regexp.MustCompile(`\\*\[feat.[^)]*\]*`)
 	songTitle = rmParens.ReplaceAllLiteralString(songTitle, "")
 	songTitle = rmSquareBrackets.ReplaceAllLiteralString(songTitle, "")
+
+	// Youtube description titles
+	rmFtDot := regexp.MustCompile(`\\*( ft\..*)`)
+	songTitle = rmFtDot.ReplaceAllLiteralString(songTitle, "")
+	rmFeatDot := regexp.MustCompile(`\\*( feat\..*)`)
+	songTitle = rmFeatDot.ReplaceAllLiteralString(songTitle, "")
+	rmProdDot := regexp.MustCompile(`\\*( prod\..*)`)
+	songTitle = rmProdDot.ReplaceAllLiteralString(songTitle, "")
 
 	return strings.TrimSpace(songTitle)
 }

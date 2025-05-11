@@ -33,6 +33,16 @@ func TestUtil(t *testing.T) {
 		}
 	})
 
+	t.Run("can remove feature from \"New Level (Remix) ft. A$AP Rocky, Future, Lil Uzi Vert\"", func(t *testing.T) {
+		title := "New Level (Remix) ft. A$AP Rocky, Future, Lil Uzi Vert"
+
+		title = CleanSongTitle(title)
+
+		if title != "New Level (Remix)" {
+			t.Errorf("Expected trimmed title to be \"New Level (Remix)\". Received \"%s\"", title)
+		}
+	})
+
 	t.Run("turns spotify link to uri", func(t *testing.T) {
 		input := "https://open.spotify.com/track/0jv5VgdENAPV7lHtBlsaXE"
 

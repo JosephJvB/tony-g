@@ -385,4 +385,202 @@ func TestSpotify(t *testing.T) {
 			panic(err)
 		}
 	})
+
+	t.Run("can find (What's So Funny Bout) Peace, Love and Understanding", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(FindTrackInput{
+			Title:  "(What's So Funny Bout) Peace, Love and Understanding",
+			Artist: "Cheekface",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: (What's So Funny Bout) Peace, Love and Understanding")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	t.Run("can find Peace, Love and Understanding", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(FindTrackInput{
+			Title:  "Peace, Love and Understanding",
+			Artist: "Cheekface",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: Peace, Love and Understanding")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	t.Run("can find Too Fast (Pull Over)", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(FindTrackInput{
+			Title:  "Too Fast (Pull Over)",
+			Artist: "Jay Rock, Anderson .Paak",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: Too Fast (Pull Over)")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	t.Run("can find Too Fast", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(FindTrackInput{
+			Title:  "Too Fast",
+			Artist: "Jay Rock, Anderson .Paak",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: Too Fast")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	t.Run("can find Captive of the Sun (Remix)", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(FindTrackInput{
+			Title:  "Captive of the Sun (Remix)",
+			Artist: "Parquet Courts",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: Captive of the Sun (Remix)")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	t.Run("can find New Level (Remix)", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(FindTrackInput{
+			Title:  "New Level (Remix)",
+			Artist: "A$AP Ferg",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: New Level (Remix)")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
 }
