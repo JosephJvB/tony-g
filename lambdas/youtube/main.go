@@ -28,6 +28,13 @@ func handleLambdaEvent(evt Evt) {
 	paramClient := ssm.NewClient()
 	paramClient.LoadParameterValues()
 
+	yt := youtube.NewClient(paramClient.YoutubeApiKey.Value)
+	allVideos := yt.LoadPlaylistItems()
+	fmt.Printf("Loaded %d youtube videos\n", len(allVideos))
+	if len(allVideos) == 0 {
+		return
+	}
+
 	gs := googlesheets.NewClient(googlesheets.Secrets{
 		Email:      paramClient.GoogleClientEmail.Value,
 		PrivateKey: paramClient.GooglePrivateKey.Value,
@@ -39,13 +46,6 @@ func handleLambdaEvent(evt Evt) {
 	prevVideoMap := map[string]bool{}
 	for _, v := range prevVideos {
 		prevVideoMap[v.Id] = true
-	}
-
-	yt := youtube.NewClient(paramClient.YoutubeApiKey.Value)
-	allVideos := yt.LoadPlaylistItems()
-	fmt.Printf("Loaded %d youtube videos\n", len(allVideos))
-	if len(allVideos) == 0 {
-		return
 	}
 
 	nextVideos := []youtube.PlaylistItem{}
@@ -184,39 +184,36 @@ func handleLambdaEvent(evt Evt) {
 			}
 		}
 	}
+	fmt.Printf("Found %d Melon (Deluxe) playlists\n", len(byYear))
 
 	for year, uris := range toAddByYear {
 		playlistName := spotify.YoutubePlaylistPrefix + strconv.Itoa(year)
-		fmt.Printf("finding playlist %s\n", playlistName)
 
-		// issue: same as previous service, sometimes this code is not finding playlist by name
-		// 1. did I not structure the name correctly?
-		// 2. more likely: I didn't load the right playlist from Spotify
-		// if problem persists, I'll make a new Sheet storing year -> playlistId mapping
-		currentTrackMap := map[string]bool{}
 		playlist, ok := byYear[year]
 		fmt.Printf("spotify playlist for %d exists: %t\n", year, ok)
 
+		newTracks := []string{}
 		if !ok {
 			fmt.Printf("creating spotify playlist: %d\n", year)
 			playlist = spc.CreatePlaylist(playlistName)
+			newTracks = uris
 		} else {
 			currentTracks := spc.GetPlaylistItems(playlist.Id)
 			fmt.Printf("loaded %d tracks for playlist: %d\n", len(currentTracks), year)
+
+			currentTrackMap := map[string]bool{}
 			for _, t := range currentTracks {
-				currentTrackMap[t.Track.Id] = true
+				currentTrackMap[t.Track.Uri] = true
+			}
+			for _, uri := range uris {
+				if !currentTrackMap[uri] {
+					newTracks = append(newTracks, uri)
+				}
 			}
 		}
 
-		add := []string{}
-		for _, uri := range uris {
-			if !currentTrackMap[uri] {
-				add = append(add, uri)
-			}
-		}
-
-		fmt.Printf("adding %d tracks to playlist %s\n", len(add), playlistName)
-		spc.AddPlaylistItems(playlist.Id, add)
+		fmt.Printf("adding %d tracks to playlist %s\n", len(newTracks), playlistName)
+		spc.AddPlaylistItems(playlist.Id, newTracks)
 	}
 
 	fmt.Printf("Adding %d track rows to google sheets\n", len(nextTrackRows))

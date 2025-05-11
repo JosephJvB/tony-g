@@ -175,3 +175,6 @@ how to I wanna launch this
 
 Could everything be in package main?? Have i been overcomplicating the package names
 I strongly suspect ya yes yup
+
+check i'm not going over my allowed search quota
+https://console.cloud.google.com/apis/api/customsearch.googleapis.com/metrics?authuser=1&inv=1&invt=AbxFsQ&project=tnd-best-tracks&pageState=(%22duration%22:(%22groupValue%22:%22P1D%22,%22customValue%22:null))
