@@ -4,14 +4,17 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-	"tony-gony/internal/googlesheets"
-	"tony-gony/internal/scraping"
-	"tony-gony/internal/spotify"
-	"tony-gony/internal/ssm"
-	"tony-gony/internal/util"
+	"tony-g/internal/apple"
+	"tony-g/internal/googlesheets"
+	"tony-g/internal/spotify"
+	"tony-g/internal/ssm"
 
 	"github.com/aws/aws-lambda-go/lambda"
 )
+
+// AppleTrackListItem
+// -> ScrapedTrack - can I skip this?
+// -> AppleTrackRow
 
 // if this lambda was regularly invoked
 // I would initialize AWS clients here
@@ -30,8 +33,11 @@ func handleLambdaEvent(evt Evt) {
 		evt.Year = now.Year()
 	}
 
-	sc := scraping.NewClient()
-	scrapedTracks := sc.GetTracksForYear(evt.Year)
+	ac := apple.NewClient()
+	scrapedTracks := ac.GetTracksForYear(evt.Year)
+	if len(scrapedTracks) == 0 {
+		return
+	}
 
 	fmt.Printf(
 		"scraped %d tracks apple music playlist:%d\n",
@@ -50,24 +56,29 @@ func handleLambdaEvent(evt Evt) {
 		Email:      paramClient.GoogleClientEmail.Value,
 		PrivateKey: paramClient.GooglePrivateKey.Value,
 	})
-	gs.LoadScrapedTracks()
+	prevTracks := gs.GetAppleTracks()
 
 	fmt.Printf(
 		"loaded %d tracks from google sheets\n",
-		len(gs.ScrapedTracksMap),
+		len(prevTracks),
 	)
 
+	m := map[string]bool{}
+	for _, t := range prevTracks {
+		m[t.GetAppleTrackId()] = true
+	}
+
 	// don't lookup tracks if they're already in Google Sheets
-	toLookup := []scraping.ScrapedTrack{}
+	toLookup := []apple.ScrapedTrack{}
 	for _, t := range scrapedTracks {
-		// keyed by custom id. See `util.go`
-		if !gs.ScrapedTracksMap[t.Id] {
+		i := t.GetAppleTrackId()
+
+		if !m[i] {
 			toLookup = append(toLookup, t)
 		}
 	}
 
 	fmt.Printf("you gotta find %d tracks\n", len(toLookup))
-
 	if len(toLookup) == 0 {
 		return
 	}
@@ -78,44 +89,44 @@ func handleLambdaEvent(evt Evt) {
 		RefreshToken: paramClient.SpotifyRefreshToken.Value,
 	})
 
-	nextRows := []googlesheets.ScrapedTrackRow{}
+	nextRows := []googlesheets.AppleTrackRow{}
 	foundTracks := []spotify.SpotifyTrack{}
 	for i, t := range toLookup {
 		fmt.Printf("finding track %d/%d\r", i+1, len(toLookup))
-		results := spc.FindTrack(t)
+		results := spc.FindTrack(spotify.FindTrackInput{
+			Title:  t.Title,
+			Artist: t.Artist,
+		})
 
-		// on first failure - try normalize track title
-		if len(results) == 0 {
-			withoutFeatureStr := util.RemoveFeatureString(t.Title)
-			if withoutFeatureStr != t.Title {
-				t2 := t
-				t2.Title = withoutFeatureStr
-				results = spc.FindTrack(t2)
-			}
-		}
-
+		href := ""
 		if len(results) > 0 {
 			foundTracks = append(foundTracks, results[0])
+			href = results[0].ExternalUrls.Spotify
 		}
 
-		nextRows = append(nextRows, googlesheets.ScrapedTrackRow{
-			Title:   t.Title,
-			Artist:  t.Artist,
-			Album:   t.Album,
-			Year:    t.Year,
-			Found:   len(results) > 0,
-			AddedAt: timestamp,
+		nextRows = append(nextRows, googlesheets.AppleTrackRow{
+			Title:      t.Title,
+			Artist:     t.Artist,
+			Album:      t.Album,
+			SpotifyUrl: href,
+			Year:       t.Year,
+			AddedAt:    timestamp,
 		})
 	}
 
 	fmt.Printf("\nfound %d/%d tracks\n", len(foundTracks), len(toLookup))
 
-	tonyPlaylistName := spotify.TonyPlaylistPrefix + strconv.Itoa(evt.Year)
+	tonyPlaylistName := spotify.ApplePlaylistPrefix + strconv.Itoa(evt.Year)
 	fmt.Printf("finding playlist %s\n", tonyPlaylistName)
 
 	myPlaylists := spc.GetMyPlaylists()
 	fmt.Printf("loaded %d playlists\n", len(myPlaylists))
 
+	// issue: same as previous service, sometimes this code is not finding playlist by name
+	// 1. did I not structure the name correctly?
+	// 2. more likely: I didn't load the right playlist from Spotify
+	// if problem persists, I'll make a new Sheet storing year -> playlistId mapping
+	//
 	// choosing this as my pattern for handling struct not found in list
 	// copying `value, ok := dict["key"] access`
 	tonyPlaylist, ok := spotify.SpotifyPlaylist{}, false
@@ -154,7 +165,7 @@ func handleLambdaEvent(evt Evt) {
 
 	fmt.Printf("adding %d rows to scraped google sheet\n", len(nextRows))
 
-	gs.AddNextRows(nextRows)
+	gs.AddAppleTracks(nextRows)
 }
 
 func main() {

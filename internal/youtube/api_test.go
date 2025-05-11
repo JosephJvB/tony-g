@@ -14,9 +14,8 @@ func TestYoutube(t *testing.T) {
 	t.Run("it can create a new youtube client", func(t *testing.T) {
 		t.Skip("its messing with the youtube api key")
 		testApiKey := "_test_youtubeApiKey"
-		os.Setenv("YOUTUBE_API_KEY", testApiKey)
 
-		yt := NewClient()
+		yt := NewClient(testApiKey)
 
 		if yt.apiKey == "" {
 			t.Errorf("apiKey not set on Youtube Client")
@@ -32,16 +31,16 @@ func TestYoutube(t *testing.T) {
 			log.Fatal("Error loading .env file")
 		}
 
-		yt := NewClient()
+		apiKey := os.Getenv("YOUTUBE_API_KEY")
+		yt := NewClient(apiKey)
 
-		yt.PlaylistItems = []PlaylistItem{}
-		yt.LoadPlaylistItems("")
+		items := yt.LoadPlaylistItems()
 
-		if len(yt.PlaylistItems) == 0 {
+		if len(items) == 0 {
 			t.Errorf("Failed to load playlist items")
 		}
 
-		b, err := json.MarshalIndent(yt.PlaylistItems, "", "	")
+		b, err := json.MarshalIndent(items, "", "	")
 		if err != nil {
 			panic(err)
 		}
@@ -58,10 +57,28 @@ func TestYoutube(t *testing.T) {
 		// gock.Observe(gock.DumpRequest)
 
 		testApiKey := "_test_youtubeApiKey"
-		os.Setenv("YOUTUBE_API_KEY", testApiKey)
-
 		testPageToken := "_test_pageToken"
 
+		gock.New("https://www.googleapis.com").
+			Get("/youtube/v3/playlistItems").
+			MatchParam("maxResults", "50").
+			MatchParam("playlistId", "PLP4CSgl7K7or84AAhr7zlLNpghEnKWu2c").
+			MatchParam("part", "snippet,status").
+			MatchParam("key", testApiKey).
+			Reply(200).
+			JSON(map[string]any{
+				"nextPageToken": testPageToken,
+				"items": []map[string]any{
+					{
+						"snippet": map[string]any{
+							"resourceId": map[string]any{
+								"videoId": "_test_id1",
+							},
+						},
+					},
+				},
+			})
+		// 2nd
 		gock.New("https://www.googleapis.com").
 			Get("/youtube/v3/playlistItems").
 			MatchParam("maxResults", "50").
@@ -72,24 +89,30 @@ func TestYoutube(t *testing.T) {
 			Reply(200).
 			JSON(map[string]any{
 				"nextPageToken": "",
-				"items": []PlaylistItem{
+				"items": []map[string]any{
 					{
-						Id: "_test_id",
+						"snippet": map[string]any{
+							"resourceId": map[string]any{
+								"videoId": "_test_id2",
+							},
+						},
 					},
 				},
 			})
 
-		yt := NewClient()
+		yt := NewClient(testApiKey)
 
-		yt.LoadPlaylistItems(testPageToken)
+		items := yt.LoadPlaylistItems()
 
-		if len(yt.PlaylistItems) != 1 {
-			t.Errorf("Expected to load one playlist item received %d", len(yt.PlaylistItems))
+		if len(items) != 2 {
+			t.Errorf("Expected to load two playlist items received %d", len(items))
 		}
 
-		testItemId := yt.PlaylistItems[0].Id
-		if testItemId != "_test_id" {
-			t.Errorf("Expected test playlist item to have Id _test_id. Received %s", testItemId)
+		if items[0].Snippet.ResourceId.VideoId != "_test_id1" {
+			t.Errorf("Expected test playlist item 1 to have Id _test_id1. Received %s", items[0].Snippet.ResourceId.VideoId)
+		}
+		if items[1].Snippet.ResourceId.VideoId != "_test_id2" {
+			t.Errorf("Expected test playlist item 2 to have Id _test_id2. Received %s", items[1].Snippet.ResourceId.VideoId)
 		}
 	})
 }

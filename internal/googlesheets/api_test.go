@@ -43,16 +43,13 @@ func TestGoogleSheets(t *testing.T) {
 			PrivateKey: fixedKey,
 		})
 
-		gs.LoadScrapedTracks()
+		tracks := gs.GetAppleTracks()
 
-		if len(gs.scrapedTracks) == 0 {
+		if len(tracks) == 0 {
 			t.Errorf("Expected parsed videos to be loaded")
 		}
-		if len(gs.ScrapedTracksMap) == 0 {
-			t.Errorf("Expected parsed videos map to be loaded")
-		}
 
-		b, err := json.MarshalIndent(gs.scrapedTracks, "", "	")
+		b, err := json.MarshalIndent(tracks, "", "	")
 		if err != nil {
 			panic(err)
 		}
@@ -83,27 +80,25 @@ func TestGoogleSheets(t *testing.T) {
 			PrivateKey: fixedKey,
 		})
 
-		toAdd := []ScrapedTrackRow{
+		toAdd := []AppleTrackRow{
 			{
-				Id:      "",
-				Title:   "song 9",
-				Artist:  "artist 9",
-				Album:   "album 9",
-				Year:    2023,
-				Found:   true,
-				AddedAt: "2024-04-16T00:00:00.000Z",
+				Title:      "song 9",
+				Artist:     "artist 9",
+				Album:      "album 9",
+				SpotifyUrl: "https://open.spotify.com/track/123",
+				Year:       2023,
+				AddedAt:    "2024-04-16T00:00:00.000Z",
 			},
 			{
-				Id:      "",
-				Title:   "song 2",
-				Artist:  "artist 2",
-				Album:   "album 2",
-				Year:    2025,
-				Found:   true,
-				AddedAt: "2025-04-16T00:00:00.000Z",
+				Title:      "song 2",
+				Artist:     "artist 2",
+				Album:      "album 2",
+				SpotifyUrl: "https://open.spotify.com/track/123",
+				Year:       2025,
+				AddedAt:    "2025-04-16T00:00:00.000Z",
 			},
 		}
 
-		gs.AddNextRows(toAdd)
+		gs.AddAppleTracks(toAdd)
 	})
 }

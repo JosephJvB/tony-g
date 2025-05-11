@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	"tony-gony/internal/scraping"
 
 	"github.com/joho/godotenv"
 )
@@ -185,10 +184,9 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(scraping.ScrapedTrack{
+		found := s.FindTrack(FindTrackInput{
 			Title:  "My Golden Years",
 			Artist: "The Lemon Twigs",
-			Year:   2025,
 		})
 
 		if len(found) == 0 {
@@ -219,10 +217,9 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(scraping.ScrapedTrack{
+		found := s.FindTrack(FindTrackInput{
 			Title:  "Somethin' (feat. Sexyy Red)",
 			Artist: "Nardo Wick",
-			Year:   2025,
 		})
 
 		if len(found) == 0 {
@@ -253,12 +250,11 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(scraping.ScrapedTrack{
+		found := s.FindTrack(FindTrackInput{
 			// i think i gotta trim "(feat. ...)" and "[feat. ...]"
 			Title: "FUNKFEST (feat. TJOnline)", // fails
 			// Title:  "FUNKFEST)", // works
 			Artist: "grouptherapy., Jadagrace & SWIM",
-			Year:   2023,
 		})
 
 		if len(found) == 0 {
@@ -289,12 +285,11 @@ func TestSpotify(t *testing.T) {
 			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
 		})
 
-		found := s.FindTrack(scraping.ScrapedTrack{
+		found := s.FindTrack(FindTrackInput{
 			// i think i gotta trim "(feat. ...)" and "[feat. ...]"
 			Title: "Times Is Rough (feat. Heem B$F & Rick Hyde)", // fails
 			// Title:  "Times Is Rough", // works
 			Artist: "Black Soprano Family, Benny the Butcher & DJ Premier",
-			Year:   2022,
 		})
 
 		if len(found) == 0 {
@@ -334,7 +329,7 @@ func TestSpotify(t *testing.T) {
 
 		fmt.Printf("Found %d playlists\n", len(p))
 
-		playlistName := TonyPlaylistPrefix + "2025"
+		playlistName := ApplePlaylistPrefix + "2025"
 		playlist, ok := SpotifyPlaylist{}, false
 		for _, p := range p {
 			if p.Name == playlistName {
@@ -353,6 +348,39 @@ func TestSpotify(t *testing.T) {
 		}
 
 		err = os.WriteFile("../../data/2025-playlist.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	t.Run("can find Blood of the Fang with typo", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(FindTrackInput{
+			Title:  "Blood on the Fang", // fails
+			Artist: "clipping.",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find track: 'Blood on the Fang'")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
 		if err != nil {
 			panic(err)
 		}

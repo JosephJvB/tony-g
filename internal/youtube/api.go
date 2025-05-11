@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 )
 
@@ -14,17 +13,20 @@ const BaseUrl = "https://www.googleapis.com/youtube/v3"
 const PlaylistId = "PLP4CSgl7K7or84AAhr7zlLNpghEnKWu2c"
 
 type YoutubeClient struct {
-	apiKey        string
-	PlaylistItems []PlaylistItem
+	apiKey string
 }
 
 type PlaylistItem struct {
-	Id      string `json:"id"`
 	Snippet struct {
+		Title               string `json:"title"`
 		Description         string `json:"description"`
 		PublishedAt         string `json:"publishedAt"`
 		VideoOwnerChannelId string `json:"videoOwnerChannelId"`
 		ChannelId           string `json:"channelId"`
+		ResourceId          struct {
+			Kind    string `json:"kind"`
+			VideoId string `json:"videoId"`
+		} `json:"resourceId"`
 	} `json:"snippet"`
 	Status struct {
 		PrivacyStatus string `json:"privacyStatus"`
@@ -36,19 +38,28 @@ type ApiResponse struct {
 	Items         []PlaylistItem `json:"items"`
 }
 
-func (yt *YoutubeClient) LoadPlaylistItems(pageToken string) {
+func (yt *YoutubeClient) LoadPlaylistItems() []PlaylistItem {
 	resp := getPlaylistItems(
 		yt.apiKey,
 		PlaylistId,
-		pageToken,
+		"",
 	)
 
-	yt.PlaylistItems = append(yt.PlaylistItems, resp.Items...)
+	items := resp.Items
+	pageToken := resp.NextPageToken
 
-	// recurse
-	if resp.NextPageToken != "" {
-		yt.LoadPlaylistItems(resp.NextPageToken)
+	for pageToken != "" {
+		resp := getPlaylistItems(
+			yt.apiKey,
+			PlaylistId,
+			pageToken,
+		)
+
+		items = append(items, resp.Items...)
+		pageToken = resp.NextPageToken
 	}
+
+	return items
 }
 
 func getPlaylistItems(key string, playlistId string, pageToken string) ApiResponse {
@@ -84,9 +95,8 @@ func getPlaylistItems(key string, playlistId string, pageToken string) ApiRespon
 	return responseBody
 }
 
-func NewClient() YoutubeClient {
+func NewClient(apiKey string) YoutubeClient {
 	return YoutubeClient{
-		apiKey:        os.Getenv("YOUTUBE_API_KEY"),
-		PlaylistItems: []PlaylistItem{},
+		apiKey: apiKey,
 	}
 }

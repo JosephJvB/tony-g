@@ -21,6 +21,10 @@ type SsmClient struct {
 	SpotifyClientId     Parameter
 	SpotifyClientSecret Parameter
 	SpotifyRefreshToken Parameter
+	GeminiApiKey        Parameter
+	GoogleSearchApiKey  Parameter
+	GoogleSearchCx      Parameter
+	YoutubeApiKey       Parameter
 }
 
 func NewClient() SsmClient {
@@ -56,6 +60,24 @@ func NewClient() SsmClient {
 			Name:  "/Tony2Stack/spotify/refresh-token",
 			Value: "",
 		},
+		// Gemini
+		GeminiApiKey: Parameter{
+			Name:  "/Tony2Stack/google/gemini/api-key",
+			Value: "",
+		},
+		// Google Search
+		GoogleSearchApiKey: Parameter{
+			Name:  "/Tony2Stack/google/search/api-key",
+			Value: "",
+		},
+		GoogleSearchCx: Parameter{
+			Name:  "/Tony2Stack/google/search/cx",
+			Value: "",
+		},
+		YoutubeApiKey: Parameter{
+			Name:  "/Tony2Stack/youtube/api-key",
+			Value: "",
+		},
 	}
 }
 
@@ -66,6 +88,10 @@ func (sc *SsmClient) LoadParameterValues() {
 		sc.SpotifyClientId,
 		sc.SpotifyClientSecret,
 		sc.SpotifyRefreshToken,
+		sc.GeminiApiKey,
+		sc.GoogleSearchApiKey,
+		sc.GoogleSearchCx,
+		sc.YoutubeApiKey,
 	}
 
 	names := []string{}
@@ -96,4 +122,8 @@ func (sc *SsmClient) LoadParameterValues() {
 	sc.SpotifyClientId.Value = m[sc.SpotifyClientId.Name]
 	sc.SpotifyClientSecret.Value = m[sc.SpotifyClientSecret.Name]
 	sc.SpotifyRefreshToken.Value = m[sc.SpotifyRefreshToken.Name]
+	sc.GeminiApiKey.Value = m[sc.GeminiApiKey.Name]
+	sc.GoogleSearchApiKey.Value = m[sc.GoogleSearchApiKey.Name]
+	sc.GoogleSearchCx.Value = m[sc.GoogleSearchCx.Name]
+	sc.YoutubeApiKey.Value = m[sc.YoutubeApiKey.Name]
 }
