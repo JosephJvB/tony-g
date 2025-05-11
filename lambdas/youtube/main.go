@@ -16,7 +16,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// TODO: only parse videos in input event
 type Evt struct {
 	VideoIds []string `json:"year"`
 }
@@ -30,6 +29,7 @@ func handleLambdaEvent(evt Evt) {
 
 	yt := youtube.NewClient(paramClient.YoutubeApiKey.Value)
 	allVideos := yt.LoadPlaylistItems()
+
 	fmt.Printf("Loaded %d youtube videos\n", len(allVideos))
 	if len(allVideos) == 0 {
 		return
@@ -49,11 +49,10 @@ func handleLambdaEvent(evt Evt) {
 	}
 
 	nextVideos := []youtube.PlaylistItem{}
-	// custom hacking
+	//// custom hacking
 	// 479 videos total
-	avl := len(allVideos)
-	allVideos = allVideos[avl-100 : avl-1]
-	// custom hacking
+	// allVideos = allVideos[0:100]
+	//// custom hacking
 	for _, v := range allVideos {
 		if v.Status.PrivacyStatus == "private" {
 			continue
@@ -76,6 +75,17 @@ func handleLambdaEvent(evt Evt) {
 	if len(nextVideos) == 0 {
 		return
 	}
+
+	// add oldest videos oldest first
+	slices.SortFunc(nextVideos, func(a, z youtube.PlaylistItem) int {
+		if a.Snippet.PublishedAt < z.Snippet.PublishedAt {
+			return -1
+		}
+		if a.Snippet.PublishedAt > z.Snippet.PublishedAt {
+			return 1
+		}
+		return 0
+	})
 
 	gem := gemini.NewClient(
 		paramClient.GeminiApiKey.Value,
@@ -151,6 +161,11 @@ func handleLambdaEvent(evt Evt) {
 		}
 
 		fmt.Printf("\nFallback to google search for \"%s by %s\"\n", t.Title, t.Artist)
+		if gcs.RequestCount >= 100 {
+			fmt.Printf("\n\nGoogle search request limit reached. Please run this again in 24 hours\n\n")
+			break
+		}
+
 		href, ok := gcs.FindSpotifyTrackHref(googlesearch.FindTrackInput{
 			Title:  t.Title,
 			Artist: t.Artist,

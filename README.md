@@ -178,3 +178,18 @@ I strongly suspect ya yes yup
 
 check i'm not going over my allowed search quota
 https://console.cloud.google.com/apis/api/customsearch.googleapis.com/metrics?authuser=1&inv=1&invt=AbxFsQ&project=tnd-best-tracks&pageState=(%22duration%22:(%22groupValue%22:%22P1D%22,%22customValue%22:null))
+
+run without google search on loads/all of the videos?
+
+Review results:
+
+- spot check a few videos to make sure Gemini is correctly pulling tracklist
+- spot check some tracks where track url is missing:
+  - Can spotify FindTrack be improved? (a la ft. and feat.)
+    - should I make a CleanArtistName method?
+  - Would that track have been found with google search (harder to check now)
+  - Is the track just missing from Spotify Generally.
+
+It's gonna be hard to run this migration task with the Google Search limit. I guess just patience, a set of videos a day
+
+Maybe lets not run any tonight, so then by tomorrow I can run it at any hour

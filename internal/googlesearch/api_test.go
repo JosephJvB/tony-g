@@ -34,4 +34,34 @@ func TestGoogleSearchApi(t *testing.T) {
 			t.Errorf("Expected \"https://open.spotify.com/track/0jv5VgdENAPV7lHtBlsaXE\" received \"%s\"", result)
 		}
 	})
+
+	t.Run("loadRequestCount handles file not exist", func(t *testing.T) {
+		os.Remove("../../data/locking_test.txt")
+
+		c := loadRequestCount("../../data/locking_test.txt")
+
+		if c != 0 {
+			t.Errorf("Expected 0, got %d", c)
+		}
+	})
+
+	t.Run("loadRequestCount handles invalid file contents", func(t *testing.T) {
+		os.WriteFile("../../data/locking_test.txt", []byte("invalid"), 0666)
+
+		c := loadRequestCount("../../data/locking_test.txt")
+
+		if c != 0 {
+			t.Errorf("Expected 0, got %d", c)
+		}
+	})
+
+	t.Run("loadRequestCount loads prev count", func(t *testing.T) {
+		os.WriteFile("../../data/locking_test.txt", []byte("299"), 0666)
+
+		c := loadRequestCount("../../data/locking_test.txt")
+
+		if c != 299 {
+			t.Errorf("Expected 299, got %d", c)
+		}
+	})
 }

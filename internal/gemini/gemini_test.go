@@ -94,4 +94,31 @@ func TestGemini(t *testing.T) {
 			panic(err)
 		}
 	})
+
+	t.Run("Can get correct properties for video 2UADjU66-4M", func(t *testing.T) {
+		t.Skip("Skip calling real Gemini API")
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			t.Errorf("Error loading .env file")
+		}
+
+		description := "Our sponsor: http://ridgewallet.com/fantano\nUSE PROMO CODE \"MELON\" FOR 10% OFF\n\n2022 FAV TRACKS PLAYLIST: https://music.apple.com/us/playlist/my-fav-singles-of-2022/pl.u-e92LIK9VM5K\n\nTND Patreon: https://www.patreon.com/theneedledrop\n\nTurntable Lab link: http://turntablelab.com/theneedledrop\n\n\n!!!BEST TRACKS THIS WEEK!!!\n\nFire-Toolz - Soda Lake with Game Genie / Vedic Software ~ Wet Interfacing\nhttps://fire-toolz.bandcamp.com/album/i-will-not-use-the-bodys-eyes-today?from=fanpub_fnb\n\nKing Gizzard \u0026 The Lizard Wizard - Ice V\nhttps://youtu.be/ydeV1_8pM4o\nReview: https://www.youtube.com/watch?v=fmqz_1GHmg0\n\nBjörk - Atopos ft. Kasimyn\nhttps://youtu.be/9FD2mUonh5s\n\nGilla Band - Backwash\nhttps://www.youtube.com/watch?v=q07rF2E-0Hw\n\nDeerhoof - My Lovely Cat!\nhttps://deerhoof.bandcamp.com/track/my-lovely-cat\n\nMile End - FCHC\nhttps://mileendband.bandcamp.com/track/fchc\n\n\n...meh...\n\nDry Cleaning - Gary Ashby\nhttps://youtu.be/XdvrSu38pWY\n\nBrian Eno - We Let It In\nhttps://youtu.be/Dehxp3PUTkM\n\nKEN mode - Throw Your Phone in the River\nhttps://www.youtube.com/watch?v=IwL556pzCXU\n\nBlood Orange - Jesus Freak Lighter\nhttps://www.youtube.com/watch?v=f21gWR8NdC0\n\nCordae \u0026 Hit-Boy - Checkmate\nhttps://www.youtube.com/watch?v=C7riiDNIv4A\n\nRun the Jewels - Opening Theme (From ATHF)\nhttps://www.youtube.com/watch?v=eRqbUVPs1kQ\n\nMura Masa \u0026 Erika de Casier - e-motions\nhttps://www.youtube.com/watch?v=x2iURw-BA5E\n\nAlex G - Miracles\nhttps://sandy.bandcamp.com/album/god-save-the-animals\n\nRuss - That Was Me\nhttps://www.youtube.com/watch?v=n-QCrCh5HbU\n\nThe Comet Is Coming - Lucid Dreamer\nhttps://www.youtube.com/watch?v=S7imxAIydR4\n\nWILLOW - curious/furious\nhttps://www.youtube.com/watch?v=MGYa0VIDpm4\n\n\n!!!WORST TRACKS THIS WEEK!!!\n\nNickleback - San Quentin\nhttps://www.youtube.com/watch?v=woA-qNpuwTs\n\nLewis Capaldi - Forget Me\nhttps://www.youtube.com/watch?v=FnbSkATyIc8\n \n\n===================================\nSubscribe: http://bit.ly/1pBqGCN\n\nPatreon: https://www.patreon.com/theneedledrop\n\nOfficial site: http://theneedledrop.com\n\nTwitter: http://twitter.com/theneedledrop\n\nInstagram: https://www.instagram.com/afantano\n\nTikTok: https://www.tiktok.com/@theneedletok\n\nTND Twitch: https://www.twitch.tv/theneedledrop\n===================================\n\nY'all know this is just my opinion, right?"
+
+		apiKey := os.Getenv("GEMINI_API_KEY")
+
+		client := NewClient(apiKey)
+
+		tracks := client.ParseYoutubeDescription(description)
+
+		d, err := json.MarshalIndent(tracks, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
 }
