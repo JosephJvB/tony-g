@@ -193,3 +193,11 @@ Review results:
 It's gonna be hard to run this migration task with the Google Search limit. I guess just patience, a set of videos a day
 
 Maybe lets not run any tonight, so then by tomorrow I can run it at any hour
+
+It's really hard to manage this migration with google searh limit
+
+Should be so fine, for regular weekly runs. But not for this case!
+
+Be patient. 100 vids every 24 hours I think
+After 100 videos today
+Review, how many google search requests was that?

@@ -59,7 +59,7 @@ func (yt *YoutubeClient) LoadPlaylistItems() []PlaylistItem {
 		pageToken = resp.NextPageToken
 	}
 
-	return items
+	return filterPlaylistItem(items)
 }
 
 func getPlaylistItems(key string, playlistId string, pageToken string) ApiResponse {
@@ -99,4 +99,26 @@ func NewClient(apiKey string) YoutubeClient {
 	return YoutubeClient{
 		apiKey: apiKey,
 	}
+}
+
+func filterPlaylistItem(items []PlaylistItem) []PlaylistItem {
+	filtered := []PlaylistItem{}
+
+	for _, item := range items {
+		if item.Status.PrivacyStatus == "private" {
+			continue
+		}
+		if item.Snippet.VideoOwnerChannelId != item.Snippet.ChannelId {
+			continue
+		}
+		// album review, ep review, compilation review, mixtape review
+		// why are these videos in his playlist? chaotic
+		if strings.HasSuffix(strings.TrimSpace(item.Snippet.Title), "REVIEW") {
+			continue
+		}
+
+		filtered = append(filtered, item)
+	}
+
+	return filtered
 }

@@ -81,6 +81,13 @@ func CleanSongTitle(songTitle string) string {
 
 	return strings.TrimSpace(songTitle)
 }
+func RmParens(songTitle string) string {
+	rmParens := regexp.MustCompile(`\\*\([^)]*\)*`)
+	rmSquareBrackets := regexp.MustCompile(`\\*\[[^)]*\]*`)
+	songTitle = rmParens.ReplaceAllLiteralString(songTitle, "")
+	songTitle = rmSquareBrackets.ReplaceAllLiteralString(songTitle, "")
+	return strings.TrimSpace(songTitle)
+}
 
 // input: https://open.spotify.com/track/0jv5VgdENAPV7lHtBlsaXE
 // output: spotify:track:0jv5VgdENAPV7lHtBlsaXE

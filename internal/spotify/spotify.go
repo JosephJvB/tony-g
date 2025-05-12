@@ -2,11 +2,13 @@ package spotify
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 const ApiBaseUrl = "https://api.spotify.com/v1"
@@ -161,19 +163,36 @@ type FindTrackInput struct {
 }
 
 func (s *SpotifyClient) FindTrack(t FindTrackInput) []SpotifyTrack {
+	// try to find with original input
 	results := s.findTrack(t)
 
 	if len(results) > 0 {
 		return results
 	}
 
-	withoutFeatureStr := CleanSongTitle(t.Title)
-	if withoutFeatureStr == t.Title {
+	// removing feat. ft. from song title
+	cleanTitle1 := CleanSongTitle(t.Title)
+	if cleanTitle1 == t.Title {
 		return results
 	}
 
 	results = s.findTrack(FindTrackInput{
-		Title:  withoutFeatureStr,
+		Title:  cleanTitle1,
+		Artist: t.Artist,
+	})
+
+	if len(results) > 0 {
+		return results
+	}
+
+	// remove (Remix) or any other brackets from song title
+	cleanTitle2 := RmParens(cleanTitle1)
+	if cleanTitle2 == cleanTitle1 {
+		return results
+	}
+
+	results = s.findTrack(FindTrackInput{
+		Title:  cleanTitle2,
 		Artist: t.Artist,
 	})
 
@@ -219,6 +238,13 @@ func (s *SpotifyClient) findTrack(t FindTrackInput) []SpotifyTrack {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
+	}
+
+	// this only happened once but it was annoying!
+	if resp.StatusCode == 502 {
+		fmt.Println("502 Bad Gateway, sleep 3 sec & retry")
+		time.Sleep(time.Second * 3)
+		return s.findTrack(t)
 	}
 
 	if resp.StatusCode > 299 {

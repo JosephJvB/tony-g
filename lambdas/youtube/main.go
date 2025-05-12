@@ -54,12 +54,6 @@ func handleLambdaEvent(evt Evt) {
 	// allVideos = allVideos[0:100]
 	//// custom hacking
 	for _, v := range allVideos {
-		if v.Status.PrivacyStatus == "private" {
-			continue
-		}
-		if v.Snippet.ChannelId != v.Snippet.VideoOwnerChannelId {
-			continue
-		}
 		if prevVideoMap[v.Snippet.ResourceId.VideoId] {
 			continue
 		}
@@ -93,6 +87,7 @@ func handleLambdaEvent(evt Evt) {
 
 	nextTrackRows := []googlesheets.YoutubeTrackRow{}
 	nextVideoRows := []googlesheets.YoutubeVideoRow{}
+	nextVideos = nextVideos[0:100]
 	for i, v := range nextVideos {
 		fmt.Printf("Getting tracks from description %d/%d\r", i+1, len(nextVideos))
 		nextTracks := gem.ParseYoutubeDescription(v.Snippet.Description)
@@ -161,10 +156,6 @@ func handleLambdaEvent(evt Evt) {
 		}
 
 		fmt.Printf("\nFallback to google search for \"%s by %s\"\n", t.Title, t.Artist)
-		if gcs.RequestCount >= 100 {
-			fmt.Printf("\n\nGoogle search request limit reached. Please run this again in 24 hours\n\n")
-			break
-		}
 
 		href, ok := gcs.FindSpotifyTrackHref(googlesearch.FindTrackInput{
 			Title:  t.Title,

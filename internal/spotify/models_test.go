@@ -118,4 +118,15 @@ func TestSpotifyModels(t *testing.T) {
 			t.Errorf("Expected fifth fifth")
 		}
 	})
+
+	t.Run("remove all parens and brackets", func(t *testing.T) {
+		input := "Misery (feat. Kenny Segal) [feat. Obongjayar & Moonchild Sanelly]"
+		expected := "Misery"
+
+		result := RmParens(input)
+
+		if result != expected {
+			t.Errorf("Expected \"%s\", got \"%s\"", expected, result)
+		}
+	})
 }
