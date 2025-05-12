@@ -121,4 +121,31 @@ func TestGemini(t *testing.T) {
 			panic(err)
 		}
 	})
+
+	t.Run("can handle x2 multi-tracks in video 17JnPv2fTjw", func(t *testing.T) {
+		t.Skip("Skip calling real Gemini API")
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			t.Errorf("Error loading .env file")
+		}
+
+		description := "OUR SPONSOR: http://feedbands.com/needledrop\n\nAmazon link: http://amzn.to/1KZmdWI\n\nTurntable Lab link: http://turntablelab.com/theneedledrop\n\nIglooghost - Chalk Shrine MIX\nhttp://www.theneedledrop.com/articles/2017/5/iglooghost-chalk-shrine-mix\n\n!!!BEST TRACKS THIS WEEK!!!\n\nOmar Souleyman - Chobi\nhttp://www.theneedledrop.com/articles/2017/5/omar-souleyman-chobi\n\nCarly Rae Jepsen - Cut to the Feeling\nhttps://itun.es/us/Z_o0jb?i=1238429684\n\nBrockhampton - Gold / Heat / Face\nhttp://www.theneedledrop.com/articles/2017/5/brockhampton-gold\nhttps://youtu.be/Jpu0JZxDz-w\nhttps://youtu.be/_nWYiEq4wd0\n\nKirin J Callinan - Down 2 Hang / Living Each Day\nhttps://soundcloud.com/terrible-records/kirin-j-callinan-living-each-day\nhttps://soundcloud.com/terrible-records/kirin-j-callinan-down-2-hang\n\nShabazz Palaces - Since C.A.Y.A.\nhttps://www.youtube.com/watch?v=kCf2JrICz9Y\n\nalt-j - Adeline\nhttps://www.youtube.com/watch?v=1XwU8H6e8Ts\u0026feature=youtu.be\n\n...MEH...\n\nWashed Out - Get Lost\nhttps://open.spotify.com/album/3gHgPOe5PfA5jo2G1VawqG\n\nAni DiFranco - Zizzing ft. Justin Vernon\nhttp://www.stereogum.com/1942765/ani-difranco-zizzing-feat-justin-vernon/music/\n\nChromatics - Shadow\nhttp://www.theneedledrop.com/articles/2017/5/chromatics-shadow\n\n21 Savage - Issa ft. Young Thug \u0026 Drake\nhttp://www.stereogum.com/1942825/21-savage-issa-feat-drake-young-thug/music/\n\nBADBADNOTGOOD - To You (Andy Shauf Cover)\nhttps://open.spotify.com/album/4cuPfZ4xor2yMdakZOIReX\n\nBleachers - I Miss Those Days\nhttps://youtu.be/qQy12GH1Fl4\n\n!!!WORST TRACKS THIS WEEK!!!\n\nHalsey - Strangers ft. Lauren Jauregui\nhttps://www.youtube.com/watch?v=e3hjpNuvapQ\n\n Chuck Berry - Lady B. Goode\nhttps://itun.es/us/JPbiib?i=1210064091\n\n===================================\nSubscribe: http://bit.ly/1pBqGCN\n\nOfficial site: http://theneedledrop.com\n\nTND Twitter: http://twitter.com/theneedledrop\n\nTND Facebook: http://facebook.com/theneedledrop\n\nSupport TND: http://theneedledrop.com/support\n===================================\n\nY'all know this is just my opinion, right?"
+
+		apiKey := os.Getenv("GEMINI_API_KEY")
+
+		client := NewClient(apiKey)
+
+		tracks := client.ParseYoutubeDescription(description)
+
+		d, err := json.MarshalIndent(tracks, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
 }

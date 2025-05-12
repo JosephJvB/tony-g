@@ -36,7 +36,12 @@ func NewClient(apiKey string) GeminiClient {
 }
 
 func (c *GeminiClient) ParseYoutubeDescription(description string) []ParsedTrack {
-	input := "Return the Best Tracks mentioned in the following text snippet\nTracks are usually listed in format {artist} - {title}\n" + description
+	input := "Return the Best Tracks mentioned in the following text snippet"
+	input += "\nformat \"{artist} - {title}\n{url}\""
+	// handle multi track for one artist case
+	input += "\nIf title has one or more slash character and there is more than one url, return multiple tracks and split the titles by slash character"
+	input += "\n"
+	input += description
 
 	result, err := c.client.Models.GenerateContent(
 		c.ctx,

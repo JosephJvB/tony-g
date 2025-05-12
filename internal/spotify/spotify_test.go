@@ -616,4 +616,37 @@ func TestSpotify(t *testing.T) {
 			panic(err)
 		}
 	})
+
+	t.Run("can find The Lord of Lightning Vs. Balrog", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api. Nm, these are two different songs. Tony's fault.")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(FindTrackInput{
+			Title:  "The Lord of Lightning Vs. Balrog",
+			Artist: "King Gizzard & The Lizard Wizard",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find: The Lord of Lightning Vs. Balrog")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
 }
