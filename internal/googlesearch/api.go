@@ -14,6 +14,9 @@ import (
 // only 100 free requests a day ay cuz
 // https://developers.google.com/custom-search/v1/introduction?authuser=1
 // https://github.com/googleapis/google-api-go-client/blob/main/examples/customsearch.go
+// oops I'm supposed to move to vertex ai search
+// https://cloud.google.com/generative-ai-app-builder/docs/migrate-from-cse
+// but then, I'm not using a site restricted search cx atm.
 type GoogleSearchClient struct {
 	svc *customsearch.Service
 	cx  string

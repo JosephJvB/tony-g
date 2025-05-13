@@ -37,8 +37,10 @@ func TestGoogleSearchApi(t *testing.T) {
 		}
 	})
 
+	// Results: it's a shared quota for the project.
+	// I could make another project and cycle that way but let's stop here.
 	t.Run("try with cse service", func(t *testing.T) {
-		// t.Skip("Skip calling real CustomSearch API")
+		t.Skip("Skip calling real CustomSearch API")
 
 		err := godotenv.Load("../../.env")
 		if err != nil {
