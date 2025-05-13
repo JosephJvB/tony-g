@@ -239,3 +239,237 @@ Details:
 ]
 , rateLimitExceeded
 exit status 1
+
+After updates:
+
+Gemini found 794 tracks in 100 video descriptions
+finding track 14/794
+Fallback to google search for "Tookie Knows II: Part (2) by ScHoolboy Q"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 17/794
+Fallback to google search for "Bomaye ft. Joey Purp by Thelonious Martin"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 22/794
+Fallback to google search for "First Day out tha Feds by Gucci Mane"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 24/794
+Fallback to google search for "ᴗ ˳ ᴗ Snoring (Music to Sleep To) by IGLOOGHOST"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 25/794
+Fallback to google search for "Entrañas by Arca"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 38/794
+Fallback to google search for "Today by Denzel Curry"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 43/794
+Fallback to google search for "K33p Ur Dr34ms by DJ Windows 98 (Win Butler)"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 49/794
+Fallback to google search for "Pokémon Go (Poké Don't Stop) by Hot Dad"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 64/794
+Fallback to google search for "I Might Vote 4 Donald Trump by JPEGMAFIA x Freaky"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 78/794
+Fallback to google search for "i mean by Isaiah Rashad"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 99/794
+Fallback to google search for "Swim Meet by Crapface x Elevation"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 101/794
+Fallback to google search for "Easy To Forget ft. Ariel Pink by Drug Dealer"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 103/794
+Fallback to google search for "Like Wassup ft. K$upreme and BIGBRUTHACHUBBA by Lil Yachty"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 112/794
+Fallback to google search for "Cowtown (TMBG Cover) by Open Mike Eagle"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 125/794
+Fallback to google search for "How Can You Tell When It's Done by Baauer x CZ"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 130/794
+Fallback to google search for "Homeboy Sandman EP by Aesop Rock"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 131/794
+Fallback to google search for "Crowned by Captain Murphy"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 150/794
+Fallback to google search for "Freaky Hoe by Rick Ross"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 153/794
+Fallback to google search for "Make Hay by Joanna Newsom"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 164/794
+Fallback to google search for "Full of Hell split by Nails"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 170/794
+Fallback to google search for "Deaf Dumb and Blind by Black Lips"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 173/794
+Fallback to google search for "Machine, Man & Moster ft. Conway by Czarface"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 190/794
+Fallback to google search for "Terminator ft. A$AP Ferg (prod. Maaly Raw) by Lil Yachty"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 194/794
+Fallback to google search for "hethens freestyle. by Vic Mensa"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 201/794
+Fallback to google search for "Bad Day ft. Freddie Gibbs by The Avalanches"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 208/794
+Fallback to google search for "Tears On Fire by Ariel Pink & Weyes Blood"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 217/794
+Fallback to google search for "Stairway to Mar-a-Lago by United Nations"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 218/794
+Fallback to google search for "SETUP ft. A$AP Ferg by Kirk Knight"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 240/794
+Fallback to google search for "The Ultimate Jedi Who Wastes All the Other Jedi and Eats Their Bones by Mountain Goats"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 245/794
+Fallback to google search for "It Takes Two by Mike Will Made-It, Lil Yachty, Carly Rae Jepsen"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 275/794
+Fallback to google search for "You're The Problem Here by First Aid Kit"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 293/794
+Fallback to google search for "Be Yourself by Foxygen"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 305/794
+Fallback to google search for "Stray Dog by Popcaan"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 316/794
+Fallback to google search for "Mad Nice ft. Black Thought and Vinny Price by Dangerdoom"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 318/794
+Fallback to google search for "Psychic Drift by White Suns"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 339/794
+Fallback to google search for "Touble Adjusting by Miya Folick"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 344/794
+Fallback to google search for "Groundhog's Day by billy woods"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 349/794
+Fallback to google search for "Chase Me ft. Run the Jewels and Big Boi by Dangermouse"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 363/794
+Fallback to google search for "The Lord of Lightning Vs. Balrog by King Gizzard & The Lizard Wizard"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 369/794
+Fallback to google search for "WTF You Doin ft. Quavo, Duke & Rich the Kid by Young Thug"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 372/794
+Fallback to google search for "KALI YUGA by GHOSTEMANE X CLAMS CASINO"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 374/794
+Fallback to google search for "SeanPaulWasNeverThereToGiveMeTheLight ft. Danny Brown by Bones"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 440/794
+Fallback to google search for "ZKITTLES by Zomby"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 444/794
+Fallback to google search for "Twilight Pretender (I forgot to mention it!) by James Ferraro"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 446/794
+Fallback to google search for "Stanger's Kiss ft. Angel Olsen by Alex Cameron"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 451/794
+Fallback to google search for "Possessive by Classixx"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 452/794
+Fallback to google search for "Marine Tigers by TWIABP"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 457/794
+Fallback to google search for "Ode to the Goat (Thank You) by Ariel Pink"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 459/794
+Fallback to google search for "Young Martha - Homie ft. Meek Mill by Young Thug & Carnage"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 460/794
+Fallback to google search for "Satan, Luella and I by HMLTD"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 488/794
+Fallback to google search for "GORILLA MONSOON by WESTSIDEDOOM"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 492/794
+Fallback to google search for "Pure Country by Father John Misty"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 494/794
+Fallback to google search for "2STINGS prod. The Alchemist by WESTSIDEDOOM"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 510/794
+Fallback to google search for "Rank Mankind by Krallice & Dave Edwardson"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 514/794
+Fallback to google search for "Choila by DADHELO"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 528/794
+Fallback to google search for "Hard To Be A God by Health x NOLIFE"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 534/794
+Fallback to google search for "Rudolph the Rednose Reindeer by DMX"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 571/794
+Fallback to google search for "THUGZ CRY by Joey Bada$$"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 614/794
+Fallback to google search for "Painkiller ft. Sky Ferreira by Iceage"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 638/794
+Fallback to google search for "33rd Blakk Glass by ZillaKami x SosMula x Thraxxx (City Morgue)"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 641/794
+Fallback to google search for "Das Cap (Remix) by Tabby"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 684/794
+Fallback to google search for "Me&My by André 3000"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 685/794
+Fallback to google search for "Look Ma No Hands by André 3000"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 692/794
+Fallback to google search for "4 Chainz ft. Clams Casino by Lil Peep"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 697/794
+Fallback to google search for "Old N*ggas by YBN Cordae"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 704/794
+Fallback to google search for "Duppy Freestyle by Drake"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 711/794
+Fallback to google search for "Yume wo miyou by Haru Nemuri"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 713/794
+Fallback to google search for "Dhorimviskha Digest by Koenji Hyakkei"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 728/794
+Fallback to google search for "3 Knifes by Code Orange"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 741/794
+Fallback to google search for "Today Your Love, Tomorrow the World by Parquet Courts"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 749/794
+Fallback to google search for "Millennium Freestyle by JPEGMAFIA"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 753/794
+Fallback to google search for "Double Negative Triptych by Low"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 763/794
+Fallback to google search for "Don't Be Famous by Brockhampton"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 768/794
+Fallback to google search for "Girl's Night Out by Charli XCX"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 774/794
+Fallback to google search for "Scammalot by Future"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+finding track 776/794
+Fallback to google search for "Translator by Future"
+Google Search disabled by .env var "GOOGLE_SEARCH_DISABLED"
+Found 718 / 794 tracks
+exit early testing search results

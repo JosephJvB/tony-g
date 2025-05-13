@@ -88,13 +88,6 @@ func handleLambdaEvent(evt Evt) {
 	//// custom hacking for migration only
 	for i, v := range nextVideos {
 		fmt.Printf("Getting tracks from description %d/%d\r", i+1, len(nextVideos))
-		// try avoid rate limit
-		// https://ai.google.dev/gemini-api/docs/rate-limits
-		// 15 requests per minute
-		// 1000 requests per day
-		if i > 0 {
-			time.Sleep(3 * time.Second)
-		}
 		nextTracks := gem.ParseYoutubeDescription(v.Snippet.Description)
 
 		nv := googlesheets.YoutubeVideoRow{

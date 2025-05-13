@@ -212,3 +212,6 @@ There were more tracks than I expected
 I guess cos I filtered out some invalid videos today there were more tracks to query
 I also just fixed a bug where it was including ...meh... tracks. So maybe it was searching for more cos of that too.
 Lets run in full and see total tracks
+yeah that's lower now
+and I fixed a bug meaning more songs would not be found in Spotify so would need google search
+Confident that another run with limit 100 would WORK

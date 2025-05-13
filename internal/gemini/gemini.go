@@ -68,6 +68,10 @@ func (c *GeminiClient) ParseYoutubeDescription(description string) []ParsedTrack
 						"artist": {Type: genai.TypeString},
 						"url":    {Type: genai.TypeString},
 					},
+					// haven't tried this
+					// idk if I need it
+					// But Conall is using this property: https://github.com/schwart/Pull-Request-Writer/blob/master/gemini.go
+					// Required: []string{"title", "artist"},
 				},
 			},
 		},
@@ -75,11 +79,18 @@ func (c *GeminiClient) ParseYoutubeDescription(description string) []ParsedTrack
 	// just had an error:
 	// "Error 503, Message: The service is currently unavailable., Status: UNAVAILABLE, Details: []"
 	// what's the best way to retry on that case?
+	// try avoid rate limit
+	// https://ai.google.dev/gemini-api/docs/rate-limits
+	// I'm currently on gemini-2.0-flash
+	// 15 requests per minute
+	// 1000 requests per day
+	// https://console.cloud.google.com/iam-admin/quotas?authuser=1&inv=1&invt=AbxR6Q&project=tnd-best-tracks&pageState=(%22allQuotasTable%22:(%22f%22:%22%255B%255D%22))
+	// even tho the docs say I should be allowed 1500 per day, my cloud console quota is 1000
 	if err != nil {
 		errStr := err.Error()
 		if strings.HasPrefix(errStr, "Error 503: The service is currently unavailable") {
-			fmt.Println("Gemini 503 error, retry after 3 seconds")
-			time.Sleep(time.Second * 3)
+			fmt.Println("Gemini 503 error, retry after 5 seconds")
+			time.Sleep(time.Second * 5)
 			return c.ParseYoutubeDescription(description)
 		}
 
