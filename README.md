@@ -201,3 +201,14 @@ Should be so fine, for regular weekly runs. But not for this case!
 Be patient. 100 vids every 24 hours I think
 After 100 videos today
 Review, how many google search requests was that?
+
+Deploy lambda and do the last few videos from manual invoke!!
+
+omg I ran outta quota JUST for first 100 videos
+
+got to 892 of 950 tracks
+
+There were more tracks than I expected
+I guess cos I filtered out some invalid videos today there were more tracks to query
+I also just fixed a bug where it was including ...meh... tracks. So maybe it was searching for more cos of that too.
+Lets run in full and see total tracks
