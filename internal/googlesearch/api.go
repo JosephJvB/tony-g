@@ -45,7 +45,7 @@ type FindTrackInput struct {
 func (c *GoogleSearchClient) FindSpotifyTrackHref(t FindTrackInput) (spotifyTrackUrl string, ok bool) {
 	if os.Getenv("GOOGLE_SEARCH_DISABLED") != "" {
 		fmt.Println("Google Search disabled by .env var \"GOOGLE_SEARCH_DISABLED\"")
-		return "\n", false
+		return "", false
 	}
 
 	q := fmt.Sprintf("%s %s\n", t.Artist, t.Title)
