@@ -2,6 +2,8 @@ package googlesheets
 
 import (
 	"context"
+	"log"
+	"os"
 
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/option"
@@ -147,7 +149,11 @@ func (gs *GoogleSheetsClient) getRows(cfg SheetConfig) [][]interface{} {
 		Get(SpreadsheetId, sheetRange).
 		Do()
 	if err != nil {
-		panic(err)
+		// happened twice in a row! And then stopped
+		// something like this
+		// googleapi: Error 500: Internal error encountered., backendError
+		os.WriteFile("./data/googlesheets-error.txt", []byte(err.Error()), 0666)
+		log.Fatal(err)
 	}
 
 	return resp.Values

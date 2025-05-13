@@ -49,10 +49,6 @@ func handleLambdaEvent(evt Evt) {
 	}
 
 	nextVideos := []youtube.PlaylistItem{}
-	//// custom hacking
-	// 479 videos total
-	// allVideos = allVideos[0:100]
-	//// custom hacking
 	for _, v := range allVideos {
 		if prevVideoMap[v.Snippet.ResourceId.VideoId] {
 			continue
@@ -87,9 +83,18 @@ func handleLambdaEvent(evt Evt) {
 
 	nextTrackRows := []googlesheets.YoutubeTrackRow{}
 	nextVideoRows := []googlesheets.YoutubeVideoRow{}
+	//// custom hacking for migration only
 	nextVideos = nextVideos[0:100]
+	//// custom hacking for migration only
 	for i, v := range nextVideos {
 		fmt.Printf("Getting tracks from description %d/%d\r", i+1, len(nextVideos))
+		// try avoid rate limit
+		// https://ai.google.dev/gemini-api/docs/rate-limits
+		// 15 requests per minute
+		// 1000 requests per day
+		if i > 0 {
+			time.Sleep(3 * time.Second)
+		}
 		nextTracks := gem.ParseYoutubeDescription(v.Snippet.Description)
 
 		nv := googlesheets.YoutubeVideoRow{

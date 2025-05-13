@@ -3,7 +3,10 @@ package gemini
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
+	"strings"
+	"time"
 
 	"google.golang.org/genai"
 )
@@ -37,6 +40,8 @@ func NewClient(apiKey string) GeminiClient {
 
 func (c *GeminiClient) ParseYoutubeDescription(description string) []ParsedTrack {
 	input := "Return the Best Tracks mentioned in the following text snippet"
+	// it was giving me ...meh... tracks
+	input += "\nIgnore the tracks in the \"meh\" and \"worst\" sections"
 	input += "\nformat \"{artist} - {title}\n{url}\""
 	// handle multi track for one artist case
 	input += "\nIf title has one or more slash character and there is more than one url, return multiple tracks and split the titles by slash character"
@@ -67,7 +72,17 @@ func (c *GeminiClient) ParseYoutubeDescription(description string) []ParsedTrack
 			},
 		},
 	)
+	// just had an error:
+	// "Error 503, Message: The service is currently unavailable., Status: UNAVAILABLE, Details: []"
+	// what's the best way to retry on that case?
 	if err != nil {
+		errStr := err.Error()
+		if strings.HasPrefix(errStr, "Error 503: The service is currently unavailable") {
+			fmt.Println("Gemini 503 error, retry after 3 seconds")
+			time.Sleep(time.Second * 3)
+			return c.ParseYoutubeDescription(description)
+		}
+
 		log.Fatal(err)
 	}
 

@@ -148,4 +148,38 @@ func TestGemini(t *testing.T) {
 			panic(err)
 		}
 	})
+
+	// This Is My Town / My Love For You Is Undying by Sun Kil Moon (Mark Kozelek)
+	// OH! There's () in the artist name. Maybe that's the issue
+	// wait Gemini tried to give me a MEH track!
+	t.Run("Only gets best tracks. Not from ...Meh... section: gmlOJPAQHAE", func(t *testing.T) {
+		t.Skip("Skip calling real Gemini API")
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			t.Errorf("Error loading .env file")
+		}
+
+		description := "FAV TRACKS Spotify playlist: https://open.spotify.com/user/tndausten/playlist/6eJIhC4KhMXDWrmheBW74m\n\nTurntable Lab link: http://turntablelab.com/theneedledrop\n\nAmazon link: http://amzn.to/1KZmdWI\n\n!!!BEST TRACKS THIS WEEK!!!\n\nJoey Bada$$ - THUGZ CRY\nhttps://youtu.be/73XVZ8jbKC4\n\nAlice Bag - Turn It Up\nhttps://youtu.be/Nt23p0h971k\n\nLet's Eat Grandma - Hot Pink (prod. SOPHIE)\nhttps://youtu.be/k0M3iIf2wdg\n\nUnknown Mortal Orchestra - American Guilt\nhttps://youtu.be/yFFa440Mo0I\n\nJulia Holter - So Humble The Afternoon\nhttp://www.adultswim.com/music/singles-2017/41\n\nJMSN - So Badly\nhttps://www.youtube.com/watch?time_continue=3\u0026v=sPaRSXdb4uU\n\nAlbert Hammond Jr. - Muted Beatings\nhttps://www.youtube.com/watch?v=YOFkQ9kh3CE\u0026ab_channel=RedBullRecords\n\n...MEH...\n\nSun Kil Moon (Mark Kozelek) - This Is My Town / My Love For You Is Undying\nhttp://www.theneedledrop.com/articles/2018/2/mark-kozelek-this-is-my-town-my-love-for-you-is-undying\n\nStreet Sects - Things Will Be Better In Hell\nhttp://www.brooklynvegan.com/street-sects-releasing-new-7-things-will-be-better-in-hell-stream-it/\n\nAndrew W.K. - Ever Again\nhttps://youtu.be/U_EupMUsb50\n\nChromeo - Bedroom Calling ft. The-Dream\nhttps://youtu.be/c1cvDqM_CMg\n\nCHVRCHES - Get Out\nhttps://youtu.be/LHUKKrcXfJs\n\nThe Streets - If You Ever Need To Talk I'm Here\nhttps://open.spotify.com/album/6TBVJXWURuv32vl6CbP5X6\n\nEd Schrader's Music Beat - Riddles\nhttps://youtu.be/rjhgPJXX7nw\n\n!!!WORST TRACKS THIS WEEK!!!\n\nIggy Azalea - Savior ft. Quavo\nhttps://soundcloud.com/iggy-azalea-official/savior-feat-quavo\n\nThe Weeknd, Kendrick Lamar - Pray For Me\nhttps://youtu.be/K5xERXE7pxI\n\n===================================\nSubscribe: http://bit.ly/1pBqGCN\n\nOfficial site: http://theneedledrop.com\n\nTND Twitter: http://twitter.com/theneedledrop\n\nTND Facebook: http://facebook.com/theneedledrop\n\nSupport TND: http://theneedledrop.com/support\n===================================\n\nY'all know this is just my opinion, right?"
+
+		apiKey := os.Getenv("GEMINI_API_KEY")
+
+		client := NewClient(apiKey)
+
+		tracks := client.ParseYoutubeDescription(description)
+
+		d, err := json.MarshalIndent(tracks, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
+		if err != nil {
+			panic(err)
+		}
+
+		if len(tracks) != 7 {
+			t.Errorf("Failed to get Best tracks from description. Got %d, expected 7", len(tracks))
+		}
+	})
 }
