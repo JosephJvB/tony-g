@@ -354,7 +354,7 @@ func TestSpotify(t *testing.T) {
 	})
 
 	t.Run("can find Blood of the Fang with typo", func(t *testing.T) {
-		t.Skip("skip test calling live spotify api")
+		t.Skip("skip tonys typo")
 		err := godotenv.Load("../../.env")
 		if err != nil {
 			panic(err)
@@ -585,7 +585,7 @@ func TestSpotify(t *testing.T) {
 	})
 
 	t.Run("can find Hit Me Where It Hurts (Toro Y Moi Remix)", func(t *testing.T) {
-		t.Skip("skip test calling live spotify api. Plus Tony spelt Caro's name wrong")
+		t.Skip("skip tonys typo")
 		err := godotenv.Load("../../.env")
 		if err != nil {
 			panic(err)
@@ -618,7 +618,7 @@ func TestSpotify(t *testing.T) {
 	})
 
 	t.Run("can find The Lord of Lightning Vs. Balrog", func(t *testing.T) {
-		t.Skip("skip test calling live spotify api. Nm, these are two different songs. Tony's fault.")
+		t.Skip("skip tonys typo")
 		err := godotenv.Load("../../.env")
 		if err != nil {
 			panic(err)
@@ -637,6 +637,43 @@ func TestSpotify(t *testing.T) {
 
 		if len(found) == 0 {
 			t.Error("Failed to find: The Lord of Lightning Vs. Balrog")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	t.Run("can find Dress by Buke \u0026 Gase", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api.")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		// original txt input
+		// Dress (PJ Harvey Cover) by Buke & Gase
+		// maybe i need to remove the & char?
+		// oh actually the & was encoded as \u0026 ! Maybe that's the issue
+		found := s.FindTrack(FindTrackInput{
+			Title:  "Dress (PJ Harvey Cover)",
+			Artist: "Buke \u0026 Gase",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find: Dress by Buke & Gase")
 		}
 
 		b, err := json.MarshalIndent(found, "", "	")

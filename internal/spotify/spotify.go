@@ -170,14 +170,17 @@ func (s *SpotifyClient) FindTrack(t FindTrackInput) []SpotifyTrack {
 		return results
 	}
 
-	// removing feat. ft. from song title
-	cleanTitle1 := CleanSongTitle(t.Title)
-	if cleanTitle1 == t.Title {
+	// removing feat. ... ft. ... from song title
+	titleQuery2 := CleanSongTitle(t.Title)
+	if titleQuery2 == t.Title {
+		titleQuery2 = RmParens(t.Title)
+	}
+	if titleQuery2 == t.Title {
 		return results
 	}
 
 	results = s.findTrack(FindTrackInput{
-		Title:  cleanTitle1,
+		Title:  titleQuery2,
 		Artist: t.Artist,
 	})
 
@@ -185,14 +188,14 @@ func (s *SpotifyClient) FindTrack(t FindTrackInput) []SpotifyTrack {
 		return results
 	}
 
-	// remove (Remix) or any other brackets from song title
-	cleanTitle2 := RmParens(cleanTitle1)
-	if cleanTitle2 == cleanTitle1 {
+	// remove (Remix) or any other parens/brackets section from song title
+	titleQuery3 := RmParens(titleQuery2)
+	if titleQuery3 == titleQuery2 {
 		return results
 	}
 
 	results = s.findTrack(FindTrackInput{
-		Title:  cleanTitle2,
+		Title:  titleQuery3,
 		Artist: t.Artist,
 	})
 

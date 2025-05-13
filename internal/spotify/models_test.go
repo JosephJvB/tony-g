@@ -129,4 +129,20 @@ func TestSpotifyModels(t *testing.T) {
 			t.Errorf("Expected \"%s\", got \"%s\"", expected, result)
 		}
 	})
+
+	t.Run("It handles Buke \u0026 Gase - Dress (PJ Harvey Cover)", func(t *testing.T) {
+		input := "Dress (PJ Harvey Cover)"
+
+		result1 := CleanSongTitle(input)
+
+		if result1 != "Dress (PJ Harvey Cover)" {
+			t.Errorf("Expected \"Dress (PJ Harvey Cover)\", got \"%s\"", result1)
+		}
+
+		result2 := RmParens(result1)
+
+		if result2 != "Dress" {
+			t.Errorf("Expected \"Dress\", got \"%s\"", result2)
+		}
+	})
 }
