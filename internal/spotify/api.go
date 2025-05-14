@@ -243,6 +243,7 @@ func (s *SpotifyClient) findTrack(t FindTrackInput) []SpotifyTrack {
 		panic(err)
 	}
 
+	// I think these errors were due to Office Wi-Fi dropping
 	// this only happened once but it was annoying!
 	if resp.StatusCode == 502 {
 		fmt.Println("502 Bad Gateway, sleep 3 sec & retry")

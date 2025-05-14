@@ -76,9 +76,6 @@ func (c *GeminiClient) ParseYoutubeDescription(description string) []ParsedTrack
 			},
 		},
 	)
-	// just had an error:
-	// "Error 503, Message: The service is currently unavailable., Status: UNAVAILABLE, Details: []"
-	// what's the best way to retry on that case?
 	// try avoid rate limit
 	// https://ai.google.dev/gemini-api/docs/rate-limits
 	// I'm currently on gemini-2.0-flash
@@ -87,10 +84,11 @@ func (c *GeminiClient) ParseYoutubeDescription(description string) []ParsedTrack
 	// https://console.cloud.google.com/iam-admin/quotas?authuser=1&inv=1&invt=AbxR6Q&project=tnd-best-tracks&pageState=(%22allQuotasTable%22:(%22f%22:%22%255B%255D%22))
 	// even tho the docs say I should be allowed 1500 per day, my cloud console quota is 1000
 	if err != nil {
+		// I think these errors were due to Office Wi-Fi dropping
 		errStr := err.Error()
-		if strings.HasPrefix(errStr, "Error 503: The service is currently unavailable") {
-			fmt.Println("Gemini 503 error, retry after 5 seconds")
-			time.Sleep(time.Second * 5)
+		if strings.HasPrefix(errStr, "Error 429, Message: You exceeded your current quota") {
+			fmt.Println("Gemini Quota Exceeded, 10 sec timeout")
+			time.Sleep(time.Second * 10)
 			return c.ParseYoutubeDescription(description)
 		}
 

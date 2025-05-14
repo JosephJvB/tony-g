@@ -149,6 +149,7 @@ func (gs *GoogleSheetsClient) getRows(cfg SheetConfig) [][]interface{} {
 		Get(SpreadsheetId, sheetRange).
 		Do()
 	if err != nil {
+		// I think these errors were due to Office Wi-Fi dropping
 		// happened twice in a row! And then stopped
 		// something like this
 		// googleapi: Error 500: Internal error encountered., backendError
