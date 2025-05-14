@@ -37,6 +37,32 @@ func TestGoogleSearchApi(t *testing.T) {
 		}
 	})
 
+	t.Run("search for symbol adrienne lenker", func(t *testing.T) {
+		t.Skip("Skip calling real CustomSearch API")
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			t.Errorf("Error loading .env file")
+		}
+
+		cfg := Config{
+			ApiKey: os.Getenv("GOOGLE_SEARCH_API_KEY"),
+			Cx:     os.Getenv("GOOGLE_SEARCH_CX"),
+		}
+		client := NewClient(cfg)
+
+		result, ok := client.FindSpotifyTrackHref(FindTrackInput{
+			Title:  "Symbol",
+			Artist: "Adrienne Lenker",
+		})
+		if !ok {
+			t.Fatal("Failed to find spotify track Symbol Adrienne Lenker")
+		}
+		if result != "https://open.spotify.com/track/5UvgTF3oGUxRwi96UZJd4I" {
+			t.Errorf("Expected \"https://open.spotify.com/track/5UvgTF3oGUxRwi96UZJd4I\", received %s\n", result)
+		}
+	})
+
 	// Results: it's a shared quota for the project.
 	// I could make another project and cycle that way but let's stop here.
 	t.Run("try with cse service", func(t *testing.T) {

@@ -51,7 +51,7 @@ func (c *GoogleSearchClient) FindSpotifyTrackHref(t FindTrackInput) (spotifyTrac
 		return "", false
 	}
 
-	q := fmt.Sprintf("%s %s\n", t.Artist, t.Title)
+	q := fmt.Sprintf("%s %s", t.Artist, t.Title)
 	q = url.QueryEscape(q)
 
 	resp, err := c.svc.Cse.List().
@@ -71,7 +71,7 @@ func (c *GoogleSearchClient) FindSpotifyTrackHref(t FindTrackInput) (spotifyTrac
 	// 	panic(err)
 	// }
 
-	// err = os.WriteFile("../../data/google-customsearch.json\n", d, 0666))
+	// err = os.WriteFile("../../data/google-customsearch.json", d, 0666)
 	// if err != nil {
 	// 	panic(err)
 	// }
