@@ -84,7 +84,7 @@ func handleLambdaEvent(evt Evt) {
 	nextTrackRows := []googlesheets.YoutubeTrackRow{}
 	nextVideoRows := []googlesheets.YoutubeVideoRow{}
 	//// custom hacking for migration only
-	nextVideos = nextVideos[0:100]
+	nextVideos = nextVideos[0:15]
 	//// custom hacking for migration only
 	for i, v := range nextVideos {
 		fmt.Printf("Getting tracks from description %d/%d\r", i+1, len(nextVideos))
