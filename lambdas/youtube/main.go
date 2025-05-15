@@ -84,7 +84,7 @@ func handleLambdaEvent(evt Evt) {
 	nextTrackRows := []googlesheets.YoutubeTrackRow{}
 	nextVideoRows := []googlesheets.YoutubeVideoRow{}
 	//// custom hacking for migration only
-	nextVideos = nextVideos[0:15]
+	nextVideos = nextVideos[0:100]
 	//// custom hacking for migration only
 	for i, v := range nextVideos {
 		fmt.Printf("Getting tracks from description %d/%d\r", i+1, len(nextVideos))
@@ -178,27 +178,34 @@ func handleLambdaEvent(evt Evt) {
 
 	myPlaylists := spc.GetMyPlaylists()
 	fmt.Printf("Loaded %d playlists\n", len(myPlaylists))
-	byYear := map[int]spotify.SpotifyPlaylist{}
+	playlistsByYear := map[int]spotify.SpotifyPlaylist{}
 	for _, p := range myPlaylists {
 		if strings.HasPrefix(p.Name, spotify.YoutubePlaylistPrefix) {
 			yearStr := strings.TrimPrefix(p.Name, spotify.YoutubePlaylistPrefix)
 			year, err := strconv.Atoi(yearStr)
 			if err == nil {
-				byYear[year] = p
+				playlistsByYear[year] = p
 			}
 		}
 	}
-	fmt.Printf("Found %d Melon (Deluxe) playlists\n", len(byYear))
+	fmt.Printf("Found %d Melon (Deluxe) playlists\n", len(playlistsByYear))
 
-	for year, uris := range toAddByYear {
-		playlistName := spotify.YoutubePlaylistPrefix + strconv.Itoa(year)
+	yearsSorted := []int{}
+	for year := range toAddByYear {
+		yearsSorted = append(yearsSorted, year)
+	}
+	slices.Sort(yearsSorted) // sorts in ascending, which is what I want
+	// so that spotify will order playlists from oldest to newest
+	for year := range yearsSorted {
+		uris := toAddByYear[year]
 
-		playlist, ok := byYear[year]
+		playlist, ok := playlistsByYear[year]
 		fmt.Printf("spotify playlist for %d exists: %t\n", year, ok)
 
 		newTracks := []string{}
 		if !ok {
 			fmt.Printf("creating spotify playlist: %d\n", year)
+			playlistName := spotify.YoutubePlaylistPrefix + strconv.Itoa(year)
 			playlist = spc.CreatePlaylist(playlistName)
 			newTracks = uris
 		} else {
@@ -216,7 +223,7 @@ func handleLambdaEvent(evt Evt) {
 			}
 		}
 
-		fmt.Printf("adding %d tracks to playlist %s\n", len(newTracks), playlistName)
+		fmt.Printf("adding %d tracks to playlist %s\n", len(newTracks), playlist.Name)
 		spc.AddPlaylistItems(playlist.Id, newTracks)
 	}
 
