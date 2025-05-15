@@ -182,4 +182,38 @@ func TestGemini(t *testing.T) {
 			t.Errorf("Failed to get Best tracks from description. Got %d, expected 7", len(tracks))
 		}
 	})
+
+	t.Run("Can get correct tracks from: tnYKOhCMrj4", func(t *testing.T) {
+		t.Skip("nah this is tonys mistake")
+		// 1. Big Bad Wolf is not on Spotify
+		// 2. the formatting is inconsistent: {artist} - {track1} & {track 2}
+		//    usually it's separated by forward slash.
+
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			t.Errorf("Error loading .env file")
+		}
+
+		description := "Thanks SeatGeek for sponsoring the video. Get $20 off tix w/ code DROP: https://sg.app.link/DROP\n\nFAV TRACKS Spotify playlist: https://open.spotify.com/user/tndausten/playlist/6eJIhC4KhMXDWrmheBW74m\n\nTurntable Lab link: http://turntablelab.com/theneedledrop\n\nAmazon link: http://amzn.to/1KZmdWI\n\nSHOUTOUTS:\n\nGraham Lambkin:\nhttp://www.theneedledrop.com/articles/2018/1/graham-lambkin-no-better-no-worse-vol-1\n\nCar Seat Headrest reimagines more Twin Fantasy material:\nhttps://youtu.be/fj8H_ZXLgio\n\n!!!BEST TRACKS THIS WEEK!!!\n\nJames Blake - If The Car Beside You Moves Ahead\nhttps://www.youtube.com/watch?v=bYXM3uz1bjM\n\nJean Grae \u0026 Quelle Chris - OhSh ft. Hannibal Buress\nhttp://www.theneedledrop.com/articles/2018/1/jean-grae-quelle-chris-ohsh-ft-hannibal-buress\n\nThe Voidz - Leave It In My Dreams \u0026 QYURRYUS\nhttp://www.theneedledrop.com/articles/2018/1/the-voidz-leave-it-in-my-dreams\n\nDabrye - Lil Mufukuz ft. MF DOOM\nhttps://soundcloud.com/ghostly/dabrye-lil-mufukuz-feat-doom-1\n\nJack White - Corporation\nhttps://youtu.be/VFnXRntc9XA\n\nLil Wayne - Bloody Mary ft. Juelz Santana \u0026 Big Bad Wolf\nhttps://youtu.be/lYATz3STgew\nhttps://youtu.be/FOLQlEh1D20\n\n...MEH...\n\nHop Along - How Simple\nhttps://youtu.be/mf3H30pQ9ms\n\nMigos - Supastars\nhttps://youtu.be/hYc95vB-nT4\n\nAlice Glass - Cease \u0026 Desist\nhttps://youtu.be/QwswX7hRRgo\n\nFranz Ferdinand - Lazy Boy\nhttps://youtu.be/PNsUgvkjviY\n\nYoung Thug - MLK ft. Trouble and Shad Da God\nhttps://youtu.be/mbsSCJEP7oo\n\n!!!WORST TRACKS THIS WEEK!!!\n\nA$AP Rocky - Above / ☆☆☆☆☆ 5IVE $TAR$\nhttps://soundcloud.com/awgeshit/aap-rocky-above\nhttps://soundcloud.com/awgeshit/aap-rocky-5ive-tar\n\nBeck - I'm Waiting For The Man\nhttps://open.spotify.com/track/0IXsvVaa6mKZzziC95y40s\n\nAmanda Palmer - The Mess Inside\nhttps://youtu.be/Nug52TuotYU\n\nSting \u0026 Shaggy - Don't Make Me Wait\nhttps://youtu.be/cOaRPJQXFG4\n\n===================================\nSubscribe: http://bit.ly/1pBqGCN\n\nOfficial site: http://theneedledrop.com\n\nTND Twitter: http://twitter.com/theneedledrop\n\nTND Facebook: http://facebook.com/theneedledrop\n\nSupport TND: http://theneedledrop.com/support\n===================================\n\nY'all know this is just my opinion, right?"
+
+		apiKey := os.Getenv("GEMINI_API_KEY")
+
+		client := NewClient(apiKey)
+
+		tracks := client.ParseYoutubeDescription(description)
+
+		d, err := json.MarshalIndent(tracks, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/gemini-description-resp.json", d, 0666)
+		if err != nil {
+			panic(err)
+		}
+
+		if len(tracks) != 7 {
+			t.Errorf("Failed to get Best tracks from description. Got %d, expected 7", len(tracks))
+		}
+	})
 }
