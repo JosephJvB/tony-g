@@ -84,7 +84,7 @@ func handleLambdaEvent(evt Evt) {
 	nextTrackRows := []googlesheets.YoutubeTrackRow{}
 	nextVideoRows := []googlesheets.YoutubeVideoRow{}
 	//// custom hacking for migration only
-	nextVideos = nextVideos[0:100]
+	nextVideos = nextVideos[0:50]
 	//// custom hacking for migration only
 	for i, v := range nextVideos {
 		fmt.Printf("Getting tracks from description %d/%d\r", i+1, len(nextVideos))
@@ -196,7 +196,7 @@ func handleLambdaEvent(evt Evt) {
 	}
 	slices.Sort(yearsSorted) // sorts in ascending, which is what I want
 	// so that spotify will order playlists from oldest to newest
-	for year := range yearsSorted {
+	for _, year := range yearsSorted {
 		uris := toAddByYear[year]
 
 		playlist, ok := playlistsByYear[year]
