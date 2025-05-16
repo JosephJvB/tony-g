@@ -132,6 +132,7 @@ func handleLambdaEvent(evt Evt) {
 	toAddByYear := map[int][]string{}
 	foundMap := map[string]int{}
 	totalFound := 0
+	numSearches := 0
 	for i, t := range nextTrackRows {
 		fmt.Printf("finding track %d/%d\r", i+1, len(nextTrackRows))
 
@@ -153,7 +154,8 @@ func handleLambdaEvent(evt Evt) {
 			continue
 		}
 
-		fmt.Printf("\nFallback to google search for \"%s by %s\"\n", t.Title, t.Artist)
+		fmt.Printf("\nGoogle Search %d / 100(quotaLimit): \"%s by %s\"\n", numSearches, t.Title, t.Artist)
+		numSearches++
 
 		href, ok := gcs.FindSpotifyTrackHref(googlesearch.FindTrackInput{
 			Title:  t.Title,
