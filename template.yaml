@@ -17,7 +17,7 @@ Globals:
     Environment:
       Variables:
         DEBUG: !Ref Debug
-        GOOGLE_SEARCH_DISABLED: 'yup'
+        # GOOGLE_SEARCH_DISABLED: undefined
 
 # https://docs.aws.amazon.com/lambda/latest/dg/golang-package.html#golang-package-create-sam
 Resources:
