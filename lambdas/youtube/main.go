@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"slices"
 	"strconv"
 	"strings"
@@ -83,9 +84,8 @@ func handleLambdaEvent(evt Evt) {
 
 	nextTrackRows := []googlesheets.YoutubeTrackRow{}
 	nextVideoRows := []googlesheets.YoutubeVideoRow{}
-	//// custom hacking for migration only
-	nextVideos = nextVideos[0:100]
-	//// custom hacking for migration only
+	upper := int(math.Min(float64(len(nextVideos)), 5)) // max 5 videos
+	nextVideos = nextVideos[0:upper]
 	for i, v := range nextVideos {
 		fmt.Printf("Getting tracks from description %d/%d\r", i+1, len(nextVideos))
 		nextTracks := gem.ParseYoutubeDescription(v.Snippet.Description)
