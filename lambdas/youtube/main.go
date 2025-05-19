@@ -14,7 +14,7 @@ import (
 	"tony-g/internal/ssm"
 	"tony-g/internal/youtube"
 
-	"github.com/joho/godotenv"
+	"github.com/aws/aws-lambda-go/lambda"
 )
 
 type Evt struct {
@@ -240,9 +240,5 @@ func handleLambdaEvent(evt Evt) {
 }
 
 func main() {
-	// lambda.Start(handleLambdaEvent)
-	godotenv.Load(".env")
-	handleLambdaEvent(Evt{
-		VideoIds: []string{},
-	})
+	lambda.Start(handleLambdaEvent)
 }
