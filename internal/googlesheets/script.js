@@ -42,7 +42,7 @@ function sortYoutubeVideos(sheet) {
 function sortYoutubeTracks(sheet) {
   var range = sheet.getRange('A2:G')
   range.sort([
-    { column: 6, ascending: false }, // videopublish date
-    { column: 7, ascending: false }, // added_at
+    { column: 8, ascending: false }, // videopublish date
+    { column: 9, ascending: false }, // added_at
   ])
 }

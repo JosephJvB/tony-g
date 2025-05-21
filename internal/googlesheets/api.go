@@ -32,7 +32,7 @@ var YoutubeVideoSheet = SheetConfig{
 var YoutubeTrackSheet = SheetConfig{
 	Name:        "Youtube Tracks",
 	Id:          1330220669,
-	AllRowRange: "A2:F",
+	AllRowRange: "A2:I",
 }
 
 type GoogleSheetsClient struct {
@@ -173,5 +173,22 @@ func (gs *GoogleSheetsClient) addRows(cfg SheetConfig, rows [][]interface{}) {
 	req.ValueInputOption("RAW")
 	req.InsertDataOption("INSERT_ROWS")
 
+	req.Do()
+}
+
+func (gs *GoogleSheetsClient) updateValues(cfg SheetConfig, cellRange string, values [][]interface{}) {
+	valueRange := sheets.ValueRange{
+		MajorDimension: "ROWS",
+		Values:         values,
+	}
+
+	updateRange := cfg.Name + "!" + cellRange
+
+	req := gs.sheetsService.Spreadsheets.Values.Update(
+		SpreadsheetId,
+		updateRange,
+		&valueRange,
+	)
+	req.ValueInputOption("RAW")
 	req.Do()
 }

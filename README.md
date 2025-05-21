@@ -229,3 +229,17 @@ Go thru Google Sheet
 If you can't find the track from spotify.findTrack(), mark it
 Then replace rows
 Another job for another time, when I feel like it.
+
+I should use customsearch results "title": "symbol - song and lyrics by Adrianne Lenker | Spotify"
+
+But then what's the column structure I want?
+Title(from youtube description)
+Artist(from youtube description)
+Source("", Spotify, GoogleSearch) - I think that's still OK
+QueryResult: either Spotify Track data or Google Custom Search Data
+....
+
+I think that's good!
+
+Ah but migrating and including custom search data means RE-SEARCHING everything, Jaysus
+I guess that's OK....

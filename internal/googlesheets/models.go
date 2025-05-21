@@ -36,6 +36,8 @@ type YoutubeVideoRow struct {
 type YoutubeTrackRow struct {
 	Title            string
 	Artist           string
+	Source           string
+	FoundTrackInfo   string
 	SpotifyUrl       string
 	Link             string
 	VideoId          string
@@ -110,23 +112,27 @@ func RowToYoutubeTrack(row []interface{}) YoutubeTrackRow {
 	return YoutubeTrackRow{
 		Title:            row[0].(string),
 		Artist:           row[1].(string),
-		SpotifyUrl:       row[2].(string),
-		Link:             row[3].(string),
-		VideoId:          row[4].(string),
-		VideoPublishDate: row[5].(string),
-		AddedAt:          row[6].(string),
+		Source:           row[2].(string),
+		FoundTrackInfo:   row[3].(string),
+		SpotifyUrl:       row[4].(string),
+		Link:             row[5].(string),
+		VideoId:          row[6].(string),
+		VideoPublishDate: row[7].(string),
+		AddedAt:          row[8].(string),
 	}
 }
 
 func YoutubeTrackToRow(track YoutubeTrackRow) []interface{} {
-	r := make([]interface{}, 7)
+	r := make([]interface{}, 9)
 	r[0] = track.Title
 	r[1] = track.Artist
-	r[2] = track.SpotifyUrl
-	r[3] = track.Link
-	r[4] = track.VideoId
-	r[5] = track.VideoPublishDate
-	r[6] = track.AddedAt
+	r[2] = track.Source
+	r[3] = track.FoundTrackInfo
+	r[4] = track.SpotifyUrl
+	r[5] = track.Link
+	r[6] = track.VideoId
+	r[7] = track.VideoPublishDate
+	r[8] = track.AddedAt
 
 	return r
 }
