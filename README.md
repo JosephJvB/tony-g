@@ -215,3 +215,17 @@ Lets run in full and see total tracks
 yeah that's lower now
 and I fixed a bug meaning more songs would not be found in Spotify so would need google search
 Confident that another run with limit 100 would WORK
+
+golang lambda size much larger cos it's including golang runtime too
+is lambda size important anyway? Surely not for my purposes anyway
+nodejs ~1mb
+golang ~10mb
+
+Noticed that Joey Badass Google Searched returned a totally random spotify track:
+THE FINALS Joey Bada$$ -> https://open.spotify.com/track/6xU31XJHAwgAjfj8jBxf2k
+Perhaps tracks found by google search should be marked so they can be manually reviewed
+I feel like it wouldn't be too bad to do that via migration
+Go thru Google Sheet
+If you can't find the track from spotify.findTrack(), mark it
+Then replace rows
+Another job for another time, when I feel like it.
