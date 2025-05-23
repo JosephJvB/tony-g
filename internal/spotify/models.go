@@ -113,3 +113,15 @@ func LinkToTrackUri(link string) (string, bool) {
 
 	return uri, true
 }
+
+func GetTrackInfo(track SpotifyTrack) string {
+	artistsStr := ""
+	for i, a := range track.Artists {
+		if i > 0 {
+			artistsStr += ", "
+		}
+		artistsStr += a.Name
+	}
+
+	return track.Name + " By " + artistsStr
+}

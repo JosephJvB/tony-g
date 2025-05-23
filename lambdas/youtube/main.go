@@ -124,7 +124,7 @@ func handleLambdaEvent(evt Evt) {
 		ClientSecret: paramClient.SpotifyClientSecret.Value,
 		RefreshToken: paramClient.SpotifyRefreshToken.Value,
 	})
-	gcs := googlesearch.NewClient(googlesearch.Config{
+	gcs := googlesearch.NewClient(googlesearch.Secrets{
 		ApiKey: paramClient.GoogleSearchApiKey.Value,
 		Cx:     paramClient.GoogleSearchCx.Value,
 	})
@@ -147,6 +147,8 @@ func handleLambdaEvent(evt Evt) {
 			Artist: t.Artist,
 		})
 		if len(res) > 0 {
+			nextTrackRows[i].Source = "Spotify Search"
+			nextTrackRows[i].FoundTrackInfo = spotify.GetTrackInfo(res[0])
 			nextTrackRows[i].SpotifyUrl = res[0].ExternalUrls.Spotify
 			toAddByYear[year] = append(toAddByYear[year], res[0].Uri)
 			foundMap[t.VideoId]++
@@ -157,20 +159,22 @@ func handleLambdaEvent(evt Evt) {
 		fmt.Printf("\nGoogle Search %d / 100(quotaLimit): \"%s by %s\"\n", numSearches, t.Title, t.Artist)
 		numSearches++
 
-		href, ok := gcs.FindSpotifyTrackHref(googlesearch.FindTrackInput{
+		res2 := gcs.FindSpotifyTrack(googlesearch.FindTrackInput{
 			Title:  t.Title,
 			Artist: t.Artist,
 		})
+		if len(res2) == 0 {
+			continue
+		}
+
+		uri, ok := spotify.LinkToTrackUri(res2[0].Link)
 		if !ok {
 			continue
 		}
 
-		uri, ok := spotify.LinkToTrackUri(href)
-		if !ok {
-			continue
-		}
-
-		nextTrackRows[i].SpotifyUrl = href
+		nextTrackRows[i].Source = "Google Search"
+		nextTrackRows[i].FoundTrackInfo = res2[0].Title
+		nextTrackRows[i].SpotifyUrl = res2[0].Link
 		toAddByYear[year] = append(toAddByYear[year], uri)
 		foundMap[t.VideoId]++
 		totalFound++
