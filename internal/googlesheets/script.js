@@ -22,6 +22,9 @@ function onChange(e) {
     case 'Youtube Tracks':
       sortYoutubeTracks(sheet)
       break
+    case 'TEST':
+      sortTest(sheet)
+      break
   }
 }
 
@@ -41,6 +44,13 @@ function sortYoutubeVideos(sheet) {
 }
 function sortYoutubeTracks(sheet) {
   var range = sheet.getRange('A2:G')
+  range.sort([
+    { column: 6, ascending: false }, // videopublish date
+    { column: 7, ascending: false }, // added_at
+  ])
+}
+function sortTest(sheet) {
+  var range = sheet.getRange('A2:I')
   range.sort([
     { column: 8, ascending: false }, // videopublish date
     { column: 9, ascending: false }, // added_at

@@ -34,6 +34,11 @@ var YoutubeTrackSheet = SheetConfig{
 	Id:          1330220669,
 	AllRowRange: "A2:I",
 }
+var TestYoutubeTrackSheet = SheetConfig{
+	Name:        "TEST",
+	Id:          1316778886,
+	AllRowRange: "A2:I",
+}
 
 type GoogleSheetsClient struct {
 	sheetsService *sheets.Service
@@ -140,6 +145,32 @@ func (gs *GoogleSheetsClient) AddYoutubeTracks(nextRows []YoutubeTrackRow) {
 	}
 
 	gs.addRows(YoutubeTrackSheet, rows)
+}
+
+func (gs *GoogleSheetsClient) GetTESTTracks() []YoutubeTrackRow {
+	rows := gs.getRows(TestYoutubeTrackSheet)
+
+	tracks := []YoutubeTrackRow{}
+	for _, row := range rows {
+		r := RowToYoutubeTrack(row)
+
+		tracks = append(tracks, r)
+	}
+
+	return tracks
+}
+
+func (gs *GoogleSheetsClient) UpdateTESTSourceInfo(nextRows []YoutubeTrackRow) {
+	values := make([][]interface{}, len(nextRows))
+	for _, t := range nextRows {
+		v := make([]interface{}, 2)
+		v[0] = t.Source
+		v[1] = t.FoundTrackInfo
+
+		values = append(values, v)
+	}
+
+	gs.updateValues(TestYoutubeTrackSheet, "C2:D", values)
 }
 
 func (gs *GoogleSheetsClient) getRows(cfg SheetConfig) [][]interface{} {
