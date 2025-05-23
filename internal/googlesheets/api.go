@@ -147,6 +147,19 @@ func (gs *GoogleSheetsClient) AddYoutubeTracks(nextRows []YoutubeTrackRow) {
 	gs.addRows(YoutubeTrackSheet, rows)
 }
 
+func (gs *GoogleSheetsClient) UpdateYoutubeTracksSourceInfo(nextRows []YoutubeTrackRow) {
+	values := make([][]interface{}, len(nextRows))
+	for _, t := range nextRows {
+		v := make([]interface{}, 2)
+		v[0] = t.Source
+		v[1] = t.FoundTrackInfo
+
+		values = append(values, v)
+	}
+
+	gs.updateValues(YoutubeTrackSheet, "C2:D", values)
+}
+
 func (gs *GoogleSheetsClient) GetTESTTracks() []YoutubeTrackRow {
 	rows := gs.getRows(TestYoutubeTrackSheet)
 

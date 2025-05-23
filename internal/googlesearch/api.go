@@ -22,12 +22,12 @@ type GoogleSearchClient struct {
 	cx  string
 }
 
-type Config struct {
+type Secrets struct {
 	ApiKey string
 	Cx     string
 }
 
-func NewClient(cfg Config) GoogleSearchClient {
+func NewClient(cfg Secrets) GoogleSearchClient {
 	ctx := context.Background()
 	svc, err := customsearch.NewService(ctx, option.WithAPIKey(cfg.ApiKey))
 	if err != nil {
@@ -45,10 +45,10 @@ type FindTrackInput struct {
 	Artist string
 }
 
-func (c *GoogleSearchClient) FindSpotifyTrackHref(t FindTrackInput) (spotifyTrackUrl string, ok bool) {
+func (c *GoogleSearchClient) FindSpotifyTrack(t FindTrackInput) []*customsearch.Result {
 	if os.Getenv("GOOGLE_SEARCH_DISABLED") != "" {
 		fmt.Println("Google Search disabled by .env var \"GOOGLE_SEARCH_DISABLED\"")
-		return "", false
+		return []*customsearch.Result{}
 	}
 
 	q := fmt.Sprintf("%s %s", t.Artist, t.Title)
@@ -76,9 +76,5 @@ func (c *GoogleSearchClient) FindSpotifyTrackHref(t FindTrackInput) (spotifyTrac
 	// 	panic(err)
 	// }
 
-	if len(resp.Items) == 0 {
-		return "", false
-	}
-
-	return resp.Items[0].Link, true
+	return resp.Items
 }

@@ -686,4 +686,109 @@ func TestSpotify(t *testing.T) {
 			panic(err)
 		}
 	})
+
+	t.Run("can find Aquamarine ft. Michael Kiwanuka by Dangermouse & Black Thought", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api. Tony!!!!")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		// fails
+		// found := s.FindTrack(FindTrackInput{
+		// 	Title:  "Aquamarine ft. Michael Kiwanuka",
+		// 	Artist: "Dangermouse & Black Thought",
+		// })
+		// fails
+		// found := s.FindTrack(FindTrackInput{
+		// 	Title:  "Aquamarine",
+		// 	Artist: "Dangermouse & Black Thought",
+		// })
+		// fails
+		// found := s.FindTrack(FindTrackInput{
+		// 	Title:  "Aquamarine",
+		// 	Artist: "Dangermouse Black Thought",
+		// })
+		// WORKS
+		// found := s.FindTrack(FindTrackInput{
+		// 	Title:  "Aquamarine",
+		// 	Artist: "Danger Mouse",
+		// })
+		// WORKS
+		// found := s.FindTrack(FindTrackInput{
+		// 	Title:  "Aquamarine",
+		// 	Artist: "Danger Mouse & Black Thought",
+		// })
+		// ALSO WORKS
+		// so it's a tony issue. Danger Mouse needs a space
+		found := s.FindTrack(FindTrackInput{
+			Title:  "Aquamarine ft. Michael Kiwanuka",
+			Artist: "Danger Mouse & Black Thought",
+		})
+
+		if len(found) == 0 {
+			t.Error("Failed to find: Aquamarine by Dangermouse & Black Thought")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
+
+	// no idea why this fails
+	t.Run("can find Spirit Possession by Spirit Possession", func(t *testing.T) {
+		t.Skip("skip test calling live spotify api. No idea why")
+		err := godotenv.Load("../../.env")
+		if err != nil {
+			panic(err)
+		}
+
+		s := NewClient(Secrets{
+			ClientId:     os.Getenv("SPOTIFY_CLIENT_ID"),
+			ClientSecret: os.Getenv("SPOTIFY_CLIENT_SECRET"),
+			RefreshToken: os.Getenv("SPOTIFY_REFRESH_TOKEN"),
+		})
+
+		found := s.FindTrack(FindTrackInput{
+			Title:  "Spirit Possession",
+			Artist: "Spirit Possession",
+		})
+		// also this fails
+		// found := s.FindTrack(FindTrackInput{
+		// 	Title:  "Second Possession",
+		// 	Artist: "Spirit Possession",
+		// })
+		// this works?
+		// Something about the word "possession" being in title and in artist causing above queries to fail?
+		// found := s.FindTrack(FindTrackInput{
+		// 	Title:  "Orthodox Weapons",
+		// 	Artist: "Spirit Possession",
+		// })
+
+		if len(found) == 0 {
+			t.Error("Failed to find: Spirit Possession by Spirit Possession")
+		}
+
+		b, err := json.MarshalIndent(found, "", "	")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.WriteFile("../../data/found-track.json", b, 0666)
+		if err != nil {
+			panic(err)
+		}
+	})
 }

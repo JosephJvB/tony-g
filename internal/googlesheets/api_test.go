@@ -38,8 +38,6 @@ func TestGoogleSheets(t *testing.T) {
 		invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
 		fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
 
-		os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
-
 		gs := NewClient(Secrets{
 			Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
 			PrivateKey: fixedKey,
@@ -74,8 +72,6 @@ func TestGoogleSheets(t *testing.T) {
 		// probably would be better saved to a file than in .env. Oh well.
 		invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
 		fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
-
-		os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
 
 		gs := NewClient(Secrets{
 			Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
@@ -116,8 +112,6 @@ func TestGoogleSheets(t *testing.T) {
 		// probably would be better saved to a file than in .env. Oh well.
 		invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
 		fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
-
-		os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
 
 		gs := NewClient(Secrets{
 			Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
@@ -161,8 +155,6 @@ func TestGoogleSheets(t *testing.T) {
 		invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
 		fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
 
-		os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
-
 		gs := NewClient(Secrets{
 			Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
 			PrivateKey: fixedKey,
@@ -192,8 +184,6 @@ func TestGoogleSheets(t *testing.T) {
 		// probably would be better saved to a file than in .env. Oh well.
 		invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
 		fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
-
-		os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
 
 		gs := NewClient(Secrets{
 			Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
@@ -226,8 +216,6 @@ func TestGoogleSheets(t *testing.T) {
 		// probably would be better saved to a file than in .env. Oh well.
 		invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
 		fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
-
-		os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
 
 		gs := NewClient(Secrets{
 			Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
@@ -272,8 +260,6 @@ func TestGoogleSheets(t *testing.T) {
 		// probably would be better saved to a file than in .env. Oh well.
 		invalidKey := os.Getenv("GOOGLE_SHEETS_PRIVATE_KEY")
 		fixedKey := strings.ReplaceAll(invalidKey, "__n__", "\n")
-
-		os.Setenv("GOOGLE_SHEETS_PRIVATE_KEY", fixedKey)
 
 		gs := NewClient(Secrets{
 			Email:      os.Getenv("GOOGLE_SHEETS_EMAIL"),
