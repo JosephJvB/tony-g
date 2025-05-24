@@ -15,7 +15,8 @@ import (
 // add Source and FoundTrackInfo to YoutubeTracks in Google Sheet
 // Purpose: at a glance, review what was searched for and what was found
 // Background: noticed one case where Google Search returned the wrong track (THE FINALS by Joey Bada$$)
-func main() {
+// underscore to disable it
+func _main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file:\n%s", err.Error())
@@ -50,7 +51,10 @@ func main() {
 
 		fmt.Printf("Searching for track %d/%d \r", i+1, len(testTracks))
 
-		if track.Source != "" && track.FoundTrackInfo != "" {
+		if track.Source != "" {
+			continue
+		}
+		if track.FoundTrackInfo != "" {
 			continue
 		}
 		// ie: original search never found the track anyway :/
@@ -63,16 +67,8 @@ func main() {
 			Artist: track.Artist,
 		})
 		if len(res) > 0 {
-			artistsStr := ""
-			for i, a := range res[0].Artists {
-				if i > 0 {
-					artistsStr += ", "
-				}
-				artistsStr += a.Name
-			}
-
 			testTracks[i].Source = "Spotify Search"
-			testTracks[i].FoundTrackInfo = res[0].Name + " By " + artistsStr
+			testTracks[i].FoundTrackInfo = spotify.GetTrackInfo(res[0])
 			continue
 		}
 
@@ -88,7 +84,6 @@ func main() {
 		} else {
 			fmt.Printf("Failed to find track \"%s by %s\"\n", track.Title, track.Artist)
 		}
-
 	}
 
 	gs.UpdateYoutubeTracksSourceInfo(testTracks)

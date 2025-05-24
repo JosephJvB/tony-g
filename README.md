@@ -245,3 +245,10 @@ Ah but migrating and including custom search data means RE-SEARCHING everything,
 I guess that's OK....
 
 TODO finish migration tomorrow! run again
+
+test google search on this Cold Blood HEALTH x LAMB OF GOD
+cos it worked once and then failed a second time?
+
+Stray Dog Popcaan worked first round
+failed first migration
+then worked on second migration run? Since it wasn't excluded when script re-ran
