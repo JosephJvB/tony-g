@@ -104,6 +104,8 @@ func handleLambdaEvent(evt Evt) {
 			r := googlesheets.YoutubeTrackRow{
 				Title:            t.Title,
 				Artist:           t.Artist,
+				Source:           "",
+				FoundTrackInfo:   "",
 				SpotifyUrl:       "",
 				Link:             t.Url,
 				VideoId:          v.Snippet.ResourceId.VideoId,
