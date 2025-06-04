@@ -252,3 +252,12 @@ cos it worked once and then failed a second time?
 Stray Dog Popcaan worked first round
 failed first migration
 then worked on second migration run? Since it wasn't excluded when script re-ran
+
+I think I've manually reviewed all historic Google Search results now
+Still keen to run a script to compare old playlist items to new ones and see the difference
+
+and should definitely review those items which I was able to manually resolve that Google Search couldn't handle. See if I can improve the google search. Cos it's not a great hitrate really, maybe 50%? I wanna find that number too
+32 manually resolved
+42 found with google search
+
+So just over 50%. It's better than nothing but not gr8 for sure
